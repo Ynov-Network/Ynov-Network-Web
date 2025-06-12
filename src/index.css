@@ -50,27 +50,26 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --color-ynov-primary: var(--primary);
-  --color-ynov-secondary: oklch(0.5854 0.2041 277.12);
-  --color-ynov-accent: oklch(0.7686 0.1647 70.08);
-  --color-ynov-pink: oklch(0.6559 0.2118 354.31);
-  --color-ynov-purple: oklch(0.6056 0.2189 292.72);
+  --color-brand-secondary: oklch(0.5854 0.2041 277.12);
+  --color-brand-accent: oklch(0.7686 0.1647 70.08);
+  --color-brand-pink: oklch(0.6559 0.2118 354.31);
+  --color-brand-purple: oklch(0.6056 0.2189 292.72);
 
   --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
-  --background-image-gradient-ynov: linear-gradient(
+  --background-image-gradient-brand: linear-gradient(
     135deg,
-    var(--color-ynov-primary) 0%,
-    var(--color-ynov-secondary) 100%
+    var(--primary) 0%,
+    var(--color-brand-secondary) 100%
   );
   --background-image-gradient-pink: linear-gradient(
     135deg,
-    var(--color-ynov-pink) 0%,
-    var(--color-ynov-purple) 100%
+    var(--color-brand-pink) 0%,
+    var(--color-brand-purple) 100%
   );
   --background-image-gradient-warm: linear-gradient(
     135deg,
-    var(--color-ynov-accent) 0%,
-    var(--color-ynov-pink) 100%
+    var(--color-brand-accent) 0%,
+    var(--color-brand-pink) 100%
   );
 
   --font-sans: var(--font-sans);
@@ -98,7 +97,8 @@
   --animate-fade-in-up: fade-in-up 0.6s ease-out;
   --animate-shimmer: shimmer 3s ease-in-out infinite;
   --animate-slide-up: slide-up 0.5s ease forwards;
-  --animate-bounce-in: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  --animate-bounce-in: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+    forwards;
   --animate-spin-slow: spin-slow 8s linear infinite;
 
   @keyframes float {
@@ -367,8 +367,8 @@
 
 @layer utilities {
   .gradient-text {
-    /* Uses --background-image-gradient-ynov which references --color-ynov-primary and --color-ynov-secondary */
-    @apply bg-gradient-ynov text-transparent bg-clip-text;
+    /* Uses --background-image-gradient-brand which references --primary and --color-brand-secondary */
+    @apply bg-gradient-brand text-transparent bg-clip-text;
   }
 
   .hover-scale {
@@ -392,7 +392,7 @@
 
   /* This class sets up the ::before pseudo-element with an animation */
   .animate-pulse-ring::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 100%;
     height: 100%;
@@ -416,8 +416,8 @@
     @apply transition-all duration-300;
   }
   .hover-glow:hover {
-    /* var(--color-ynov-primary) is #24b2a4 */
-    box-shadow: 0 0 15px var(--color-ynov-primary / 0.6); /* Using CSS variable with opacity */
+    /* var(--color-primary) is #24b2a4 */
+    box-shadow: 0 0 15px var(--color-primary / 0.6); /* Using CSS variable with opacity */
   }
 }
 
@@ -427,15 +427,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Consider using a theme variable, e.g., var(--color-muted / 0.5) */
+  background: var(--muted);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c5c5c5; /* Consider using a theme variable */
+  background: var(--accent);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8; /* Consider using a theme variable */
+  background: var(--accent-foreground);
 }

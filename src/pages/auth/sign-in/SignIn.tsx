@@ -18,6 +18,7 @@ import { CustomInput } from "@/components/custom-input";
 import { Mail, Lock } from "lucide-react";
 import { useSignIn } from "@/services/auth/mutation";
 import { useNavigate } from "react-router";
+import { authClient } from "@/lib/auth-client";
 
 const signInSchema = z.object({
   university_email: z.string().email(),
@@ -42,14 +43,30 @@ export function SignIn() {
   })
 
   const onSubmit = async (values: SignInFormValues) => {
-    console.log('Sign in attempt:', values);
     return await signInMutation.mutateAsync(values, {
-      onError: (error) => toast.error(`Sign up failed: ${error.message}`),
+      onError: (error) => toast.error(`Sign in failed: ${error.message}`),
       onSuccess: () => {
-        return toast.success("Account created successfully!")
+        toast.success("Welcome back to your account!")
+        return navigate("/feed");
       },
     })
   };
+
+  // const onSubmit = async (values: SignInFormValues) => {
+  //   await authClient.signIn.email({
+  //     email: values.university_email,
+  //     password: values.password,
+  //   }, {
+  //     onSuccess(ctx) {
+  //       console.log("Sign in successful:", ctx.data);
+  //       toast.success("Welcome back to your account!")
+  //       return navigate("/feed");
+  //     },
+  //     onError(ctx) {
+  //       toast.error(`Sign in failed: ${ctx.error.message}`)
+  //     },
+  //   })
+  // };
 
   return (
     <div className="w-full flex flex-col gap-4 max-w-md mx-auto animate-slide-in-right">

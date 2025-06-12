@@ -6,17 +6,15 @@ import axios, {
 
 const axiosConfig: CreateAxiosDefaults = {
     baseURL: import.meta.env.VITE_SERVER_URL,
-    headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    },
+    withCredentials: true,
 };
+
 
 const axiosClient: AxiosInstance = axios.create(axiosConfig);
 
 const createServiceClient = (serviceName: string, options?: CreateAxiosDefaults): AxiosInstance => {
     const baseURL = new URL(serviceName, axiosConfig.baseURL).href;
+    console.log(baseURL)
     return axios.create({
         ...axiosConfig,
         ...options,

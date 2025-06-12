@@ -17,6 +17,8 @@ import Notifications from "./pages/main/notifications/Notifications";
 import Feed from "./pages/main/feed/Feed";
 import AppLayout from "./pages/main/MainLayout";
 import AuthLayout from "./pages/auth/AuthLayout";
+import TwoFactor from "./pages/main/two-factor/TwoFactor";
+import { TotpVerification } from "./pages/main/two-factor/TotpVerification";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,10 @@ const App = () => (
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/saved" element={<SavedPosts />} />
+              <Route path="/two-factor">
+                <Route path="enable" element={<TwoFactor />} />
+                <Route path="verify-totp" element={<TotpVerification />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>

@@ -81,15 +81,15 @@ const Groups = () => {
   const categories = ["All", "Tech", "Design", "Business", "Science", "Art", "Sports"];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+      <header className="bg-background border-b border-border px-6 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold gradient-text">Groups</h1>
-            <p className="text-gray-600">Connect with like-minded students</p>
+            <p className="text-muted-foreground">Connect with like-minded students</p>
           </div>
-          <Button className="bg-gradient-ynov hover:opacity-90 text-white hover-scale">
+          <Button className="bg-gradient-brand hover:opacity-90 text-white hover-scale">
             <Plus className="h-4 w-4 mr-2" />
             Create Group
           </Button>
@@ -102,7 +102,7 @@ const Groups = () => {
         <div className="mb-6 space-y-4">
           <div className="flex gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Search groups..."
                 value={searchQuery}
@@ -123,8 +123,8 @@ const Groups = () => {
                 key={category}
                 variant={category === "All" ? "default" : "secondary"}
                 className={`cursor-pointer whitespace-nowrap hover-scale ${category === "All"
-                    ? "bg-ynov-primary hover:bg-ynov-primary/90"
-                    : "hover:bg-gray-200"
+                  ? "bg-primary hover:bg-primary/90"
+                  : "hover:bg-accent"
                   }`}
               >
                 {category}
@@ -165,7 +165,7 @@ const Groups = () => {
               <CardHeader className="pt-8 pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-lg leading-tight group-hover:text-ynov-primary transition-colors flex items-center gap-2">
+                    <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors flex items-center gap-2">
                       {group.name}
                       {group.isAdmin && <Crown className="h-4 w-4 text-yellow-500" />}
                     </CardTitle>
@@ -177,16 +177,18 @@ const Groups = () => {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <p className="text-gray-600 text-sm line-clamp-3">{group.description}</p>
+                <div className="flex-1">
+                  <p className="text-muted-foreground text-sm line-clamp-3">{group.description}</p>
+                </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-ynov-primary" />
+                      <Users className="h-4 w-4 text-primary" />
                       <span>{group.members}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4 text-ynov-primary" />
+                      <MessageCircle className="h-4 w-4 text-primary" />
                       <span>{group.posts}</span>
                     </div>
                   </div>
@@ -198,7 +200,7 @@ const Groups = () => {
 
                 {group.isJoined ? (
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 border-ynov-primary text-ynov-primary hover:bg-ynov-primary hover:text-white">
+                    <Button variant="outline" className="flex-1 border-primary text-primary hover:bg-primary hover:text-white">
                       View Group
                     </Button>
                     <Button variant="outline" size="sm" className="px-3">
@@ -206,7 +208,7 @@ const Groups = () => {
                     </Button>
                   </div>
                 ) : (
-                  <Button className="w-full bg-gradient-ynov hover:opacity-90 text-white">
+                  <Button className="w-full bg-gradient-brand hover:opacity-90 text-white">
                     {group.privacy === "private" ? "Request to Join" : "Join Group"}
                   </Button>
                 )}
@@ -218,7 +220,7 @@ const Groups = () => {
         {/* Trending Groups Section */}
         <div className="mt-12">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-ynov-primary" />
+            <TrendingUp className="h-5 w-5 text-primary" />
             Trending Groups
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -230,8 +232,8 @@ const Groups = () => {
                     <AvatarFallback>{group.name[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-sm truncate hover:text-ynov-primary transition-colors">{group.name}</h3>
-                    <p className="text-xs text-gray-500">{group.members} members</p>
+                    <h3 className="font-medium text-sm truncate hover:text-primary transition-colors">{group.name}</h3>
+                    <p className="text-xs text-muted-foreground">{group.members} members</p>
                   </div>
                 </div>
               </Card>

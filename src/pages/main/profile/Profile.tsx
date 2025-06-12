@@ -85,10 +85,10 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen">
+      <div className="flex-1 mb-6 mx-4">
         {/* Cover Image */}
-        <div className="relative h-48 md:h-64 bg-gradient-ynov">
+        <div className="relative h-48 md:h-64 bg-gradient-brand">
           <img
             src={profileUser.coverImage}
             alt="Cover"
@@ -98,26 +98,26 @@ const Profile = () => {
         </div>
 
         {/* Profile Info */}
-        <div className="bg-white">
+        <div className="bg-card">
           <div className="px-6 pb-6">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between -mt-16 md:-mt-20">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between -mt-10 md:-mt-16">
               {/* Avatar and Basic Info */}
               <div className="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-6">
-                <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
+                <Avatar className="h-32 w-32 border-4 border-card shadow-lg">
                   <AvatarImage src={profileUser.avatar} />
-                  <AvatarFallback className="bg-gradient-ynov text-white text-2xl font-bold">
+                  <AvatarFallback className="bg-gradient-brand text-primary-foreground text-2xl font-bold">
                     {profileUser.fullName[0]}
                   </AvatarFallback>
                 </Avatar>
 
-                <div className="space-y-2 mt-4 md:mt-0">
+                <div className="md:mt-0">
                   <div className="flex items-center space-x-2">
                     <h1 className="text-2xl font-bold">{profileUser.fullName}</h1>
                     {profileUser.verified && (
-                      <Badge className="bg-ynov-primary text-white">Verified</Badge>
+                      <Badge className="bg-primary text-primary-foreground">Verified</Badge>
                     )}
                   </div>
-                  <p className="text-gray-600">@{profileUser.username}</p>
+                  <p className="text-muted-foreground">@{profileUser.username}</p>
                 </div>
               </div>
 
@@ -125,7 +125,7 @@ const Profile = () => {
               <div className="flex space-x-3 mt-4 md:mt-0">
                 {isOwnProfile ? (
                   <Link to="/settings">
-                    <Button variant="outline" className="border-ynov-primary text-ynov-primary hover:bg-ynov-primary hover:text-white">
+                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                       <Settings className="h-4 w-4 mr-2" />
                       Edit Profile
                     </Button>
@@ -137,7 +137,7 @@ const Profile = () => {
                       Message
                     </Button>
                     <Button
-                      className={`${isFollowing ? 'bg-gray-200 text-gray-800 hover:bg-gray-300' : 'bg-gradient-ynov hover:opacity-90 text-white'}`}
+                      className={`${isFollowing ? 'bg-muted text-muted-foreground hover:bg-accent' : 'bg-gradient-brand hover:opacity-90 text-white'}`}
                       onClick={() => setIsFollowing(!isFollowing)}
                     >
                       <UserPlus className="h-4 w-4 mr-2" />
@@ -152,17 +152,17 @@ const Profile = () => {
             </div>
 
             {/* Bio and Details */}
-            <div className="mt-6 space-y-4">
-              <p className="text-gray-800 leading-relaxed max-w-2xl">{profileUser.bio}</p>
+            <div className="mt-4 space-y-4">
+              <p className="text-foreground leading-relaxed max-w-2xl">{profileUser.bio}</p>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <MapPin className="h-4 w-4" />
                   <span>{profileUser.location}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <LinkIcon className="h-4 w-4" />
-                  <a href={profileUser.website} className="text-ynov-primary hover:underline">
+                  <a href={profileUser.website} className="text-primary hover:underline">
                     portfolio.student.dev
                   </a>
                 </div>
@@ -176,11 +176,11 @@ const Profile = () => {
               <div className="flex space-x-6 text-sm">
                 <div className="flex space-x-1">
                   <span className="font-semibold">{profileUser.followingCount}</span>
-                  <span className="text-gray-600">Following</span>
+                  <span className="text-muted-foreground">Following</span>
                 </div>
                 <div className="flex space-x-1">
                   <span className="font-semibold">{profileUser.followersCount}</span>
-                  <span className="text-gray-600">Followers</span>
+                  <span className="text-muted-foreground">Followers</span>
                 </div>
               </div>
             </div>
@@ -188,30 +188,30 @@ const Profile = () => {
         </div>
 
         {/* Content Tabs */}
-        <div className="bg-white border-t border-gray-200">
+        <div className="border-t border-border">
           <Tabs defaultValue="posts" className="w-full">
-            <TabsList className="w-full rounded-none border-b bg-transparent h-auto p-0">
+            <TabsList className="w-full rounded-none border-b border-border bg-transparent h-auto p-0">
               <TabsTrigger
                 value="posts"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-ynov-primary data-[state=active]:bg-transparent px-6 py-4"
+                className="rounded-none text-md border-transparent data-[state=active]:bg-accent px-6 py-4"
               >
                 Posts
               </TabsTrigger>
               <TabsTrigger
                 value="media"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-ynov-primary data-[state=active]:bg-transparent px-6 py-4"
+                className="rounded-none text-md border-transparent data-[state=active]:bg-accent px-6 py-4"
               >
                 Media
               </TabsTrigger>
               <TabsTrigger
                 value="likes"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-ynov-primary data-[state=active]:bg-transparent px-6 py-4"
+                className="rounded-none text-md border-transparent data-[state=active]:bg-accent px-6 py-4"
               >
                 Likes
               </TabsTrigger>
             </TabsList>
 
-            <div className="p-6">
+            <div>
               <TabsContent value="posts" className="space-y-6 mt-0">
                 {userPosts.map((post) => (
                   <PostCard key={post.id} post={post} />
@@ -221,7 +221,7 @@ const Profile = () => {
               <TabsContent value="media" className="mt-0">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {[1, 2, 3, 4, 5, 6].map((item) => (
-                    <div key={item} className="aspect-square bg-gray-100 rounded-lg hover:opacity-80 transition-opacity cursor-pointer">
+                    <div key={item} className="aspect-square bg-muted rounded-lg hover:opacity-80 transition-opacity cursor-pointer">
                       <img
                         src={`https://images.unsplash.com/photo-${1581091226825 + item}?w=300&h=300&fit=crop`}
                         alt={`Media ${item}`}
@@ -234,7 +234,7 @@ const Profile = () => {
 
               <TabsContent value="likes" className="mt-0">
                 <div className="text-center py-12">
-                  <p className="text-gray-500">Liked posts will appear here</p>
+                  <p className="text-muted-foreground">Liked posts will appear here</p>
                 </div>
               </TabsContent>
             </div>

@@ -91,26 +91,26 @@ const Feed = () => {
       {/* Main Feed Area */}
       <div className="flex-1 flex px-2">
         {/* Center Feed */}
-        <div className="flex-1 py-6 max-w-4xl mx-auto px-4">
+        <div className="flex-1 py-6 mx-auto px-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6 bg-white shadow-sm rounded-xl p-1 h-12">
+            <TabsList className="grid w-full grid-cols-3 mb-6 bg-card shadow-sm rounded-xl p-1 h-12">
               <TabsTrigger
                 value="feed"
-                className="data-[state=active]:bg-gradient-ynov data-[state=active]:text-white transition-all duration-300 rounded-lg flex items-center gap-2"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 rounded-lg flex items-center gap-2"
               >
                 <Sparkles className="h-4 w-4" />
                 For You
               </TabsTrigger>
               <TabsTrigger
                 value="following"
-                className="data-[state=active]:bg-gradient-ynov data-[state=active]:text-white transition-all duration-300 rounded-lg flex items-center gap-2"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 rounded-lg flex items-center gap-2"
               >
                 <Users className="h-4 w-4" />
                 Following
               </TabsTrigger>
               <TabsTrigger
                 value="trending"
-                className="data-[state=active]:bg-gradient-ynov data-[state=active]:text-white transition-all duration-300 rounded-lg flex items-center gap-2"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 rounded-lg flex items-center gap-2"
               >
                 <TrendingUp className="h-4 w-4" />
                 Trending
@@ -139,12 +139,12 @@ const Feed = () => {
 
             <TabsContent value="following" className="space-y-6 animate-fade-in">
               <CreatePost />
-              <Card className="p-12 text-center bg-gradient-to-br from-gray-50 to-white shadow-sm">
-                <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">No posts from people you follow yet</h3>
-                <p className="text-gray-500 mb-6">Discover and follow interesting people to see their posts here</p>
+              <Card className="p-12 text-center bg-gradient-to-br from-background to-card shadow-sm">
+                <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">No posts from people you follow yet</h3>
+                <p className="text-muted-foreground mb-6">Discover and follow interesting people to see their posts here</p>
                 <Link to="/explore">
-                  <Button className="bg-gradient-ynov hover:opacity-90 text-white transition-opacity duration-200">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-opacity duration-200">
                     <Users className="h-4 w-4 mr-2" />
                     Find People to Follow
                   </Button>
@@ -156,8 +156,8 @@ const Feed = () => {
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Flame className="h-5 w-5 text-ynov-primary" />
-                    <h2 className="text-xl font-semibold">Trending Now</h2>
+                    <Flame className="h-5 w-5 text-primary" />
+                    <h2 className="text-xl font-semibold text-foreground">Trending Now</h2>
                   </div>
                   <Badge variant="outline" className="flex items-center gap-1 py-2">
                     <Clock className="h-3 w-3" />
@@ -171,19 +171,19 @@ const Feed = () => {
                     { topic: "#DesignThinking", posts: "67 posts", growth: "+12% today" },
                     { topic: "#AIInnovation", posts: "54 posts", growth: "+8% today" }
                   ].map((trend, index) => (
-                    <Card key={index} className="hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white">
-                      <CardContent className="p-4">
+                    <Card key={index} className="hover:shadow-md transition-shadow duration-200 cursor-pointer bg-card">
+                      <CardContent>
                         <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-semibold text-ynov-primary">{trend.topic}</p>
-                            <div className="flex items-center gap-2 text-gray-500 text-sm">
+                          <div className="space-y-1">
+                            <p className="font-semibold text-primary">{trend.topic}</p>
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
                               <span>{trend.posts}</span>
-                              <Badge variant="secondary" className="bg-green-100 text-green-800 font-medium">
+                              <Badge variant="secondary" className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 font-medium">
                                 {trend.growth}
                               </Badge>
                             </div>
                           </div>
-                          <TrendingUp className="h-5 w-5 text-ynov-primary" />
+                          <TrendingUp className="h-5 w-5 text-primary" />
                         </div>
                       </CardContent>
                     </Card>
@@ -209,10 +209,10 @@ const Feed = () => {
         {/* Right Sidebar with toned down animations */}
         <div className="w-80 p-3 hidden lg:block">
           {/* Trending Topics */}
-          <Card className="mb-4 overflow-hidden bg-white/80 backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="mb-4 overflow-hidden backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-0 shadow-sm">
+            <CardContent>
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="h-5 w-5 text-ynov-primary" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold">Trending at Ynov</h3>
               </div>
               <div className="space-y-2">
@@ -224,23 +224,23 @@ const Feed = () => {
                 ].map((topic, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+                    className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-accent cursor-pointer transition-colors duration-200"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-ynov-primary">{topic.tag}</p>
+                        <p className="font-medium text-primary">{topic.tag}</p>
                         {topic.hot && (
                           <Badge className="bg-red-500 text-white text-xs py-0 h-5">
                             <Flame className="h-3 w-3 mr-1" /> Hot
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">{topic.posts}</p>
+                      <p className="text-sm text-muted-foreground">{topic.posts}</p>
                     </div>
                   </div>
                 ))}
                 <Link to="/explore" className="block pt-2">
-                  <Button variant="ghost" size="sm" className="w-full text-ynov-primary hover:bg-ynov-primary/5 transition-colors">
+                  <Button variant="ghost" size="sm" className="w-full text-primary hover:bg-primary/5 transition-colors">
                     See more trends
                   </Button>
                 </Link>
@@ -249,10 +249,10 @@ const Feed = () => {
           </Card>
 
           {/* Suggested Connections */}
-          <Card className="mb-4 overflow-hidden bg-white/80 backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="mb-4 overflow-hidden backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-0 shadow-sm">
+            <CardContent>
               <div className="flex items-center gap-2 mb-4">
-                <Users className="h-5 w-5 text-ynov-primary" />
+                <Users className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold">People you might know</h3>
               </div>
               <div className="space-y-4">
@@ -274,24 +274,24 @@ const Feed = () => {
                 ].map((person, index) => (
                   <div key={index} className="flex items-center justify-between group">
                     <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10 group-hover:ring-2 group-hover:ring-ynov-primary/20 transition-all duration-200">
+                      <Avatar className="h-10 w-10 group-hover:ring-2 group-hover:ring-primary/20 transition-all duration-200">
                         <AvatarImage src={person.avatar} />
                         <AvatarFallback>{person.name[0]}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium text-sm group-hover:text-ynov-primary transition-colors">{person.name}</p>
-                        <p className="text-xs text-gray-500">@{person.username}</p>
-                        <p className="text-xs text-gray-400">{person.role}</p>
-                        <p className="text-xs text-gray-400">{person.mutualFriends}</p>
+                        <p className="font-medium text-sm group-hover:text-primary transition-colors">{person.name}</p>
+                        <p className="text-xs text-muted-foreground">@{person.username}</p>
+                        <p className="text-xs text-muted-foreground">{person.role}</p>
+                        <p className="text-xs text-muted-foreground">{person.mutualFriends}</p>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" className="text-ynov-primary border-ynov-primary hover:bg-ynov-primary hover:text-white transition-colors duration-200">
+                    <Button size="sm" variant="outline" className="text-primary border-primary hover:bg-primary hover:text-white transition-colors duration-200">
                       Follow
                     </Button>
                   </div>
                 ))}
                 <Link to="/explore" className="block pt-2">
-                  <Button variant="ghost" size="sm" className="w-full text-ynov-primary hover:bg-ynov-primary/5 transition-colors">
+                  <Button variant="ghost" size="sm" className="w-full text-primary hover:bg-primary/5 transition-colors">
                     See more people
                   </Button>
                 </Link>
@@ -300,15 +300,15 @@ const Feed = () => {
           </Card>
 
           {/* Upcoming Events */}
-          <Card className="overflow-hidden bg-white/80 backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="overflow-hidden backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-0 shadow-sm">
+            <CardContent>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-ynov-primary" />
+                  <Calendar className="h-5 w-5 text-primary" />
                   <h3 className="font-semibold">Upcoming Events</h3>
                 </div>
                 <Link to="/events">
-                  <Badge variant="outline" className="hover:bg-gray-100 cursor-pointer transition-colors">
+                  <Badge variant="outline" className="hover:bg-accent cursor-pointer transition-colors">
                     View all
                   </Badge>
                 </Link>
@@ -330,16 +330,16 @@ const Feed = () => {
                 ].map((event, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer border border-gray-100"
+                    className="p-3 rounded-lg hover:bg-accent transition-colors duration-200 cursor-pointer border border-border"
                   >
                     <h4 className="font-medium text-sm mb-1">{event.title}</h4>
-                    <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                       <Calendar className="h-3 w-3" />
                       <span>{event.date} at {event.time}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className="text-xs text-ynov-primary">{event.attendees} attending</p>
-                      <Button size="sm" variant="ghost" className="h-6 text-xs px-2 text-ynov-primary hover:bg-ynov-primary/5">
+                      <p className="text-xs text-primary">{event.attendees} attending</p>
+                      <Button size="sm" variant="ghost" className="h-6 text-xs px-2 text-primary hover:bg-primary/5">
                         Join
                       </Button>
                     </div>

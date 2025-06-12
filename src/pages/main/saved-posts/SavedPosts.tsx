@@ -120,18 +120,18 @@ const SavedPosts = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+      <header className="bg-background border-b border-border px-6 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Bookmark className="h-6 w-6 text-ynov-primary" />
+            <Bookmark className="h-6 w-6 text-primary" />
             <div>
               <h1 className="text-2xl font-bold gradient-text">Saved</h1>
-              <p className="text-gray-600">Your bookmarked content</p>
+              <p className="text-muted-foreground">Your bookmarked content</p>
             </div>
           </div>
-          <Button className="bg-gradient-ynov hover:opacity-90 text-white hover-scale">
+          <Button className="bg-gradient-brand hover:opacity-90 text-white hover-scale">
             <Plus className="h-4 w-4 mr-2" />
             New Folder
           </Button>
@@ -143,9 +143,9 @@ const SavedPosts = () => {
         {/* Left Sidebar - Folders */}
         <div className="w-64 space-y-4">
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Folder className="h-5 w-5 text-ynov-primary" />
+                <Folder className="h-5 w-5 text-primary" />
                 Folders
               </CardTitle>
             </CardHeader>
@@ -155,8 +155,8 @@ const SavedPosts = () => {
                   key={folder.name}
                   variant={folder.name === "All Items" ? "default" : "ghost"}
                   className={`w-full justify-start ${folder.name === "All Items"
-                      ? "bg-ynov-primary hover:bg-ynov-primary/90 text-white"
-                      : "hover:bg-gray-100"
+                    ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                    : "hover:bg-accent"
                     }`}
                 >
                   <folder.icon className="h-4 w-4 mr-3" />
@@ -171,19 +171,19 @@ const SavedPosts = () => {
 
           {/* Quick Stats */}
           <Card>
-            <CardContent className="p-4">
+            <CardContent >
               <h3 className="font-semibold mb-3">Quick Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total Saved</span>
+                  <span className="text-muted-foreground">Total Saved</span>
                   <span className="font-medium">{savedItems.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">This Week</span>
+                  <span className="text-muted-foreground">This Week</span>
                   <span className="font-medium">3</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">This Month</span>
+                  <span className="text-muted-foreground">This Month</span>
                   <span className="font-medium">{savedItems.length}</span>
                 </div>
               </div>
@@ -197,7 +197,7 @@ const SavedPosts = () => {
           <div className="mb-6 space-y-4">
             <div className="flex gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Search saved items..."
                   value={searchQuery}
@@ -214,13 +214,13 @@ const SavedPosts = () => {
 
           <Tabs defaultValue="grid" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="grid" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+              <TabsTrigger value="grid" className="data-[state=active]:bg-primary data-[state=active]:text-white">
                 Grid View
               </TabsTrigger>
-              <TabsTrigger value="list" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+              <TabsTrigger value="list" className="data-[state=active]:bg-primary data-[state=active]:text-white">
                 List View
               </TabsTrigger>
-              <TabsTrigger value="timeline" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+              <TabsTrigger value="timeline" className="data-[state=active]:bg-primary data-[state=active]:text-white">
                 Timeline
               </TabsTrigger>
             </TabsList>
@@ -236,7 +236,7 @@ const SavedPosts = () => {
                         className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute top-3 right-3 flex gap-2">
-                        <Badge className="bg-white/90 text-gray-700">
+                        <Badge className="bg-background/90 text-foreground">
                           {getItemIcon(item.type)}
                           <span className="ml-1 capitalize">{item.type}</span>
                         </Badge>
@@ -249,9 +249,9 @@ const SavedPosts = () => {
                     </div>
                   )}
 
-                  <CardContent className="p-4 space-y-3">
+                  <CardContent className="space-y-3">
                     <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-sm leading-tight group-hover:text-ynov-primary transition-colors line-clamp-2">
+                      <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
                         {item.title}
                       </h3>
                       <DropdownMenu>
@@ -268,17 +268,17 @@ const SavedPosts = () => {
                       </DropdownMenu>
                     </div>
 
-                    <p className="text-xs text-gray-600 line-clamp-2">{item.content}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{item.content}</p>
 
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={item.author.avatar} />
                         <AvatarFallback>{item.author.fullName[0]}</AvatarFallback>
                       </Avatar>
-                      <span className="text-xs text-gray-600">{item.author.fullName}</span>
+                      <span className="text-xs text-muted-foreground">{item.author.fullName}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Saved {new Date(item.savedDate).toLocaleDateString()}</span>
                       <Badge variant="secondary" className="text-xs">
                         {item.folder}
@@ -286,7 +286,7 @@ const SavedPosts = () => {
                     </div>
 
                     {item.type === "post" && (
-                      <div className="flex items-center gap-4 text-xs text-gray-500 pt-2 border-t">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
                         <div className="flex items-center gap-1">
                           <Heart className="h-3 w-3" />
                           {item.likes}
@@ -299,7 +299,7 @@ const SavedPosts = () => {
                     )}
 
                     {item.type === "event" && (
-                      <div className="text-xs text-gray-500 pt-2 border-t">
+                      <div className="text-xs text-muted-foreground pt-2 border-t">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {new Date(item.eventDate!).toLocaleDateString()}
@@ -308,7 +308,7 @@ const SavedPosts = () => {
                     )}
 
                     {item.readTime && (
-                      <div className="text-xs text-gray-500 pt-2 border-t">
+                      <div className="text-xs text-muted-foreground pt-2 border-t">
                         {item.readTime}
                       </div>
                     )}
@@ -320,7 +320,7 @@ const SavedPosts = () => {
             <TabsContent value="list" className="space-y-4">
               {savedItems.map((item) => (
                 <Card key={item.id} className="hover:shadow-md transition-all duration-300 hover-scale cursor-pointer">
-                  <CardContent className="p-4">
+                  <CardContent>
                     <div className="flex gap-4">
                       {(item.image || item.thumbnail) && (
                         <img
@@ -334,12 +334,12 @@ const SavedPosts = () => {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               {getItemIcon(item.type)}
-                              <h3 className="font-semibold hover:text-ynov-primary transition-colors">
+                              <h3 className="font-semibold hover:text-primary transition-colors">
                                 {item.title}
                               </h3>
                             </div>
-                            <p className="text-sm text-gray-600 line-clamp-2 mb-2">{item.content}</p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{item.content}</p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Avatar className="h-4 w-4">
                                   <AvatarImage src={item.author.avatar} />
@@ -377,30 +377,30 @@ const SavedPosts = () => {
 
             <TabsContent value="timeline" className="space-y-6">
               <div className="relative">
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border"></div>
                 {savedItems.map((item) => (
                   <div key={item.id} className="relative flex gap-6 pb-6">
-                    <div className="relative z-10 w-8 h-8 bg-ynov-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="relative z-10 w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                       {getItemIcon(item.type)}
                     </div>
                     <Card className="flex-1 hover:shadow-md transition-all duration-300 hover-scale cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold hover:text-ynov-primary transition-colors">
+                          <h3 className="font-semibold hover:text-primary transition-colors">
                             {item.title}
                           </h3>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-muted-foreground">
                             {new Date(item.savedDate).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.content}</p>
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.content}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Avatar className="h-6 w-6">
                               <AvatarImage src={item.author.avatar} />
                               <AvatarFallback>{item.author.fullName[0]}</AvatarFallback>
                             </Avatar>
-                            <span className="text-sm text-gray-600">{item.author.fullName}</span>
+                            <span className="text-sm text-muted-foreground">{item.author.fullName}</span>
                           </div>
                           <Badge variant="secondary" className="text-xs">
                             {item.folder}

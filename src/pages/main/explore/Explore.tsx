@@ -103,30 +103,30 @@ const Explore = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+      <header className="bg-background border-b border-border px-6 py-4 sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <Compass className="h-6 w-6 text-ynov-primary" />
+            <Compass className="h-6 w-6 text-primary" />
             <div>
               <h1 className="text-2xl font-bold gradient-text">Explore</h1>
-              <p className="text-gray-600">Discover trending content and connect with new people</p>
+              <p className="text-muted-foreground">Discover trending content and connect with new people</p>
             </div>
           </div>
         </div>
       </header>
 
       {/* Search Bar */}
-      <div className="px-6 py-4 bg-white border-b border-gray-100">
+      <div className="px-6 py-4 bg-background border-b border-border">
         <div className="flex gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
             <Input
               placeholder="Search for posts, people, or topics..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 text-lg bg-gray-50 border-0 focus:bg-white transition-colors"
+              className="pl-12 h-12 text-lg focus:bg-background transition-colors"
             />
           </div>
           <Button variant="outline" className="px-6 h-12">
@@ -146,11 +146,13 @@ const Explore = () => {
                 <TabsTrigger
                   key={category.name}
                   value={category.name.toLowerCase()}
-                  className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white flex items-center gap-2"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-evenly"
                 >
-                  <category.icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{category.name}</span>
-                  <Badge variant="secondary" className="hidden md:inline-flex">
+                  <div className="flex items-center gap-2">
+                    <category.icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{category.name}</span>
+                  </div>
+                  <Badge variant="default" className="hidden md:inline-flex ">
                     {category.count}
                   </Badge>
                 </TabsTrigger>
@@ -167,33 +169,33 @@ const Explore = () => {
 
             <TabsContent value="tech" className="space-y-6">
               <Card className="p-8 text-center">
-                <Hash className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Tech Posts</h3>
-                <p className="text-gray-500">Technology-related content will appear here.</p>
+                <Hash className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Tech Posts</h3>
+                <p className="text-muted-foreground">Technology-related content will appear here.</p>
               </Card>
             </TabsContent>
 
             <TabsContent value="design" className="space-y-6">
               <Card className="p-8 text-center">
-                <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Design Posts</h3>
-                <p className="text-gray-500">Design and creative content will appear here.</p>
+                <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Design Posts</h3>
+                <p className="text-muted-foreground">Design and creative content will appear here.</p>
               </Card>
             </TabsContent>
 
             <TabsContent value="videos" className="space-y-6">
               <Card className="p-8 text-center">
-                <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Video Content</h3>
-                <p className="text-gray-500">Video posts will appear here.</p>
+                <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Video Content</h3>
+                <p className="text-muted-foreground">Video posts will appear here.</p>
               </Card>
             </TabsContent>
 
             <TabsContent value="articles" className="space-y-6">
               <Card className="p-8 text-center">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Articles</h3>
-                <p className="text-gray-500">Long-form content and articles will appear here.</p>
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Articles</h3>
+                <p className="text-muted-foreground">Long-form content and articles will appear here.</p>
               </Card>
             </TabsContent>
           </Tabs>
@@ -203,22 +205,22 @@ const Explore = () => {
         <div className="w-80 space-y-6">
           {/* Trending Topics */}
           <Card>
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-ynov-primary" />
+            <CardContent>
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
+                <TrendingUp className="h-5 w-5 text-primary" />
                 Trending Topics
               </h3>
               <div className="space-y-3">
                 {trendingTopics.map((topic, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 hover:bg-gray-50 rounded-lg px-3 cursor-pointer transition-all duration-300 hover-scale group">
+                  <div key={index} className="flex justify-between items-center py-2 hover:bg-accent rounded-lg px-3 cursor-pointer transition-all duration-300 hover-scale group">
                     <div className="flex-1">
-                      <p className="font-medium text-ynov-primary group-hover:text-ynov-primary/80">{topic.tag}</p>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <p className="font-medium text-primary group-hover:text-primary/80">{topic.tag}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>{topic.posts} posts</span>
                         <span className="text-green-500">{topic.growth}</span>
                       </div>
                     </div>
-                    <Hash className="h-4 w-4 text-gray-400" />
+                    <Hash className="h-4 w-4 text-muted-foreground" />
                   </div>
                 ))}
               </div>
@@ -227,9 +229,9 @@ const Explore = () => {
 
           {/* Suggested Users */}
           <Card>
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5 text-ynov-primary" />
+            <CardContent>
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
+                <Users className="h-5 w-5 text-primary" />
                 People to Follow
               </h3>
               <div className="space-y-4">
@@ -242,19 +244,19 @@ const Explore = () => {
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1">
-                          <p className="font-medium text-sm truncate group-hover:text-ynov-primary transition-colors">{user.fullName}</p>
+                          <p className="font-medium text-sm truncate group-hover:text-primary transition-colors text-foreground">{user.fullName}</p>
                           {user.verified && (
                             <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                               <span className="text-white text-xs">✓</span>
                             </div>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 truncate">@{user.username}</p>
-                        <p className="text-xs text-gray-400 truncate">{user.bio}</p>
-                        <p className="text-xs text-gray-400">{user.followers} followers</p>
+                        <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.bio}</p>
+                        <p className="text-xs text-muted-foreground">{user.followers} followers</p>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-ynov-primary hover:bg-ynov-primary/90 text-white ml-2 hover-scale">
+                    <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground ml-2 hover-scale">
                       Follow
                     </Button>
                   </div>
@@ -265,9 +267,9 @@ const Explore = () => {
 
           {/* Recent Activity */}
           <Card>
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-ynov-primary" />
+            <CardContent>
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
+                <Clock className="h-5 w-5 text-primary" />
                 Recent Activity
               </h3>
               <div className="space-y-3">
@@ -277,11 +279,11 @@ const Explore = () => {
                   { action: "Design challenge started", time: "1 hour ago", type: "challenge" },
                   { action: "Study group formed", time: "3 hours ago", type: "group" }
                 ].map((activity, index) => (
-                  <div key={index} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                    <div className="w-2 h-2 bg-ynov-primary rounded-full"></div>
+                  <div key={index} className="flex items-center gap-3 p-2 hover:bg-accent rounded-lg transition-colors cursor-pointer">
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{activity.action}</p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
+                      <p className="text-sm font-medium text-foreground">{activity.action}</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
                     </div>
                   </div>
                 ))}

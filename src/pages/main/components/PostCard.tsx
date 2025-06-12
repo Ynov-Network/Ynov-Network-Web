@@ -98,8 +98,8 @@ const PostCard = ({ post }: PostCardProps) => {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-300 border-0 shadow-sm">
-      <CardContent className="p-6">
+    <Card className="hover:shadow-lg transition-all duration-300 border-0 shadow-sm py-6">
+      <CardContent>
         {/* Post Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
@@ -109,7 +109,7 @@ const PostCard = ({ post }: PostCardProps) => {
             </Avatar>
             <div>
               <p className="font-semibold text-sm">{post.author.fullName}</p>
-              <p className="text-xs text-gray-500">@{post.author.username} • {post.timestamp}</p>
+              <p className="text-xs text-muted-foreground">@{post.author.username} • {post.timestamp}</p>
             </div>
           </div>
 
@@ -150,7 +150,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
         {/* Post Content */}
         <div className="mb-4">
-          <p className="text-gray-800 leading-relaxed mb-3">{post.content}</p>
+          <p className="text-secondary text-sm leading-relaxed mb-3">{post.content}</p>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-3">
@@ -158,7 +158,7 @@ const PostCard = ({ post }: PostCardProps) => {
               <Badge
                 key={index}
                 variant="secondary"
-                className="text-xs bg-ynov-primary/10 text-ynov-primary hover:bg-ynov-primary/20 cursor-pointer"
+                className="text-xs bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
               >
                 #{tag}
               </Badge>
@@ -178,7 +178,7 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
 
         {/* Engagement Stats */}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
           <div className="flex space-x-4">
             <span>{likeCount} likes</span>
             <span>{comments.length} comments</span>
@@ -187,7 +187,7 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex space-x-1">
             <Button
               variant="ghost"
@@ -202,14 +202,14 @@ const PostCard = ({ post }: PostCardProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="hover:text-ynov-primary hover-scale"
+              className="hover:text-primary hover-scale"
               onClick={() => setShowComments(!showComments)}
             >
               <MessageCircle className="h-5 w-5 mr-2" />
               Comment
             </Button>
 
-            <Button variant="ghost" size="sm" className="hover:text-ynov-secondary hover-scale">
+            <Button variant="ghost" size="sm" className="hover:text-brand-secondary hover-scale">
               <Share2 className="h-5 w-5 mr-2" />
               Share
             </Button>
@@ -219,7 +219,7 @@ const PostCard = ({ post }: PostCardProps) => {
             variant="ghost"
             size="sm"
             onClick={() => setSaved(!saved)}
-            className={`hover-scale ${saved ? 'text-ynov-primary' : 'hover:text-ynov-primary'}`}
+            className={`hover-scale ${saved ? 'text-primary' : 'hover:text-primary'}`}
           >
             <Bookmark className={`h-5 w-5 ${saved ? 'fill-current' : ''}`} />
           </Button>
@@ -227,7 +227,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
         {/* Comments Section */}
         {showComments && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t">
             {/* Existing Comments */}
             <div className="space-y-3 mb-4">
               {comments.map((comment) => (
@@ -236,12 +236,12 @@ const PostCard = ({ post }: PostCardProps) => {
                     <AvatarImage src={comment.avatar} />
                     <AvatarFallback>{comment.author[0]}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 bg-gray-50 rounded-lg p-3">
+                  <div className="flex-1 bg-muted rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
                       <p className="font-semibold text-sm">{comment.author}</p>
-                      <span className="text-xs text-gray-500">{comment.timestamp}</span>
+                      <span className="text-xs text-muted-foreground">{comment.timestamp}</span>
                     </div>
-                    <p className="text-sm text-gray-800">{comment.content}</p>
+                    <p className="text-sm text-foreground">{comment.content}</p>
                   </div>
                 </div>
               ))}
@@ -265,7 +265,7 @@ const PostCard = ({ post }: PostCardProps) => {
                   size="sm"
                   onClick={handleAddComment}
                   disabled={!newComment.trim()}
-                  className="bg-ynov-primary hover:bg-ynov-primary/90 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

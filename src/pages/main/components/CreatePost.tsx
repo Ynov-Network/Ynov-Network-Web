@@ -51,11 +51,11 @@ const CreatePost = () => {
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="p-6">
+      <CardContent>
         <div className="flex space-x-4">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user?.avatar} />
-            <AvatarFallback className="bg-gradient-ynov text-white font-semibold">
+            <AvatarFallback className="bg-gradient-brand text-white font-semibold">
               {user?.fullName?.[0]}
             </AvatarFallback>
           </Avatar>
@@ -66,7 +66,7 @@ const CreatePost = () => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               onFocus={() => setIsExpanded(true)}
-              className="border-0 p-0 resize-none focus:ring-0 text-lg placeholder:text-gray-500 min-h-[60px]"
+              className="p-4 resize-none focus:ring-0 text-lg placeholder:text-muted-foreground min-h-[60px]"
               rows={isExpanded ? 4 : 2}
             />
 
@@ -89,13 +89,13 @@ const CreatePost = () => {
             )}
 
             {isExpanded && (
-              <div className="mt-4 space-y-4">
+              <div className="space-y-4 my-2">
                 {/* Media Attachment Options */}
-                <div className="flex items-center space-x-4 py-2">
+                <div className="flex items-center space-x-4">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-ynov-primary hover:text-ynov-primary hover:bg-ynov-primary/10"
+                    className="text-primary hover:text-primary hover:bg-primary/10"
                     onClick={handleImageSelect}
                   >
                     <Image className="h-5 w-5 mr-2" />
@@ -105,7 +105,7 @@ const CreatePost = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-ynov-secondary hover:text-ynov-secondary hover:bg-ynov-secondary/10"
+                    className="text-brand-secondary hover:text-brand-secondary hover:bg-brand-secondary/10"
                   >
                     <Video className="h-5 w-5 mr-2" />
                     Video
@@ -114,7 +114,7 @@ const CreatePost = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-ynov-accent hover:text-ynov-accent hover:bg-ynov-accent/10"
+                    className="text-brand-accent hover:text-brand-accent hover:bg-brand-accent/10"
                   >
                     <Smile className="h-5 w-5 mr-2" />
                     Feeling
@@ -123,7 +123,7 @@ const CreatePost = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-ynov-purple hover:text-ynov-purple hover:bg-ynov-purple/10"
+                    className="text-brand-purple hover:text-brand-purple hover:bg-brand-purple/10"
                   >
                     <MapPin className="h-5 w-5 mr-2" />
                     Location
@@ -131,8 +131,8 @@ const CreatePost = () => {
                 </div>
 
                 {/* Post Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <div className="flex items-center justify-between pt-3 border-t border-border">
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     <span>Everyone can see this post</span>
                   </div>
@@ -140,7 +140,6 @@ const CreatePost = () => {
                   <div className="flex space-x-2">
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={() => {
                         setIsExpanded(false);
                         setContent("");
@@ -151,8 +150,7 @@ const CreatePost = () => {
                     </Button>
 
                     <Button
-                      size="sm"
-                      className="bg-gradient-ynov hover:opacity-90 text-white hover-scale"
+                      className="bg-gradient-brand hover:opacity-90 text-white hover-scale"
                       onClick={handleSubmit}
                       disabled={!content.trim()}
                     >

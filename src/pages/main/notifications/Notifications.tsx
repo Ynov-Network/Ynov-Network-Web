@@ -90,7 +90,7 @@ const Notifications = () => {
       case "achievement":
         return <Trophy className="h-4 w-4 text-yellow-500" />;
       default:
-        return <Bell className="h-4 w-4 text-gray-500" />;
+        return <Bell className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -115,13 +115,13 @@ const Notifications = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen w-full">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+      <header className="bg-background border-b border-border px-6 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Bell className="h-6 w-6 text-ynov-primary" />
+              <Bell className="h-6 w-6 text-primary" />
               {unreadCount > 0 && (
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs p-0 flex items-center justify-center">
                   {unreadCount}
@@ -129,8 +129,8 @@ const Notifications = () => {
               )}
             </div>
             <div>
-              <h1 className="text-2xl font-bold gradient-text">Notifications</h1>
-              <p className="text-gray-600">Stay updated with your activity</p>
+              <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
+              <p className="text-muted-foreground">Stay updated with your activity</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -152,16 +152,16 @@ const Notifications = () => {
       <div className="flex-1 p-6">
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="all" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               All ({notifications.length})
             </TabsTrigger>
-            <TabsTrigger value="unread" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+            <TabsTrigger value="unread" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Unread ({unreadCount})
             </TabsTrigger>
-            <TabsTrigger value="mentions" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+            <TabsTrigger value="mentions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Mentions
             </TabsTrigger>
-            <TabsTrigger value="events" className="data-[state=active]:bg-ynov-primary data-[state=active]:text-white">
+            <TabsTrigger value="events" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Events
             </TabsTrigger>
           </TabsList>
@@ -169,15 +169,15 @@ const Notifications = () => {
           <TabsContent value="all" className="space-y-4">
             {notifications.length === 0 ? (
               <Card className="p-8 text-center">
-                <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications yet</h3>
-                <p className="text-gray-500">When you get notifications, they'll show up here.</p>
+                <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No notifications yet</h3>
+                <p className="text-muted-foreground">When you get notifications, they'll show up here.</p>
               </Card>
             ) : (
               notifications.map((notification) => (
                 <Card
                   key={notification.id}
-                  className={`transition-all duration-300 hover:shadow-md hover-scale cursor-pointer ${!notification.read ? 'bg-blue-50 border-l-4 border-l-ynov-primary' : ''
+                  className={`transition-all duration-300 hover:shadow-md hover-scale cursor-pointer ${!notification.read ? 'bg-primary/5 border-l-4 border-l-primary' : ''
                     }`}
                   onClick={() => !notification.read && markAsRead(notification.id)}
                 >
@@ -190,11 +190,11 @@ const Notifications = () => {
                             <AvatarFallback>U</AvatarFallback>
                           </Avatar>
                         ) : (
-                          <div className="h-12 w-12 bg-gradient-ynov rounded-full flex items-center justify-center">
+                          <div className="h-12 w-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center">
                             {getNotificationIcon(notification.type)}
                           </div>
                         )}
-                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
+                        <div className="absolute -bottom-1 -right-1 bg-card rounded-full p-1 shadow-sm">
                           {getNotificationIcon(notification.type)}
                         </div>
                       </div>
@@ -202,20 +202,20 @@ const Notifications = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
-                            <h3 className={`font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                            <h3 className={`font-medium ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
                               {notification.title}
                             </h3>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-500 mt-2">
+                            <p className="text-xs text-muted-foreground mt-2">
                               {notification.timestamp}
                             </p>
                           </div>
 
                           <div className="flex items-center gap-2">
                             {!notification.read && (
-                              <div className="w-2 h-2 bg-ynov-primary rounded-full"></div>
+                              <div className="w-2 h-2 bg-primary rounded-full"></div>
                             )}
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -244,7 +244,7 @@ const Notifications = () => {
 
                         {notification.actionable && notification.type === "follow" && (
                           <div className="flex gap-2 mt-3">
-                            <Button size="sm" className="bg-ynov-primary hover:bg-ynov-primary/90 text-white">
+                            <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                               Follow Back
                             </Button>
                             <Button size="sm" variant="outline">
@@ -264,7 +264,7 @@ const Notifications = () => {
             {notifications.filter(n => !n.read).map((notification) => (
               <Card
                 key={notification.id}
-                className="bg-blue-50 border-l-4 border-l-ynov-primary transition-all duration-300 hover:shadow-md hover-scale cursor-pointer"
+                className="bg-primary/5 border-l-4 border-l-primary transition-all duration-300 hover:shadow-md hover-scale cursor-pointer"
                 onClick={() => markAsRead(notification.id)}
               >
                 <CardContent className="p-4">
@@ -276,17 +276,17 @@ const Notifications = () => {
                           <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                       ) : (
-                        <div className="h-12 w-12 bg-gradient-ynov rounded-full flex items-center justify-center">
+                        <div className="h-12 w-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center">
                           {getNotificationIcon(notification.type)}
                         </div>
                       )}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{notification.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                      <p className="text-xs text-gray-500 mt-2">{notification.timestamp}</p>
+                      <h3 className="font-medium text-foreground">{notification.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                      <p className="text-xs text-muted-foreground mt-2">{notification.timestamp}</p>
                     </div>
-                    <div className="w-2 h-2 bg-ynov-primary rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -294,17 +294,17 @@ const Notifications = () => {
             {notifications.filter(n => !n.read).length === 0 && (
               <Card className="p-8 text-center">
                 <Check className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">All caught up!</h3>
-                <p className="text-gray-500">You have no unread notifications.</p>
+                <h3 className="text-lg font-medium text-foreground mb-2">All caught up!</h3>
+                <p className="text-muted-foreground">You have no unread notifications.</p>
               </Card>
             )}
           </TabsContent>
 
           <TabsContent value="mentions" className="space-y-4">
             <Card className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No mentions yet</h3>
-              <p className="text-gray-500">When someone mentions you, you'll see it here.</p>
+              <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No mentions yet</h3>
+              <p className="text-muted-foreground">When someone mentions you, you'll see it here.</p>
             </Card>
           </TabsContent>
 
@@ -317,9 +317,9 @@ const Notifications = () => {
                       <Calendar className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{notification.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                      <p className="text-xs text-gray-500 mt-2">{notification.timestamp}</p>
+                      <h3 className="font-medium text-foreground">{notification.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                      <p className="text-xs text-muted-foreground mt-2">{notification.timestamp}</p>
                     </div>
                   </div>
                 </CardContent>

@@ -1,11 +1,10 @@
-import { createAuthClient } from "better-auth/react"
+import { createAuthClient } from "better-auth/client"
+import { twoFactorClient } from "better-auth/client/plugins"
 
-const authClient = createAuthClient({
-  baseURL: import.meta.env.SERVER_URL
+export const authClient = createAuthClient({
+  baseURL: import.meta.env.VITE_BETTER_AUTH_URL,
+  basePath: "/api/better-auth",
+  plugins: [
+    twoFactorClient()
+  ],
 })
-
-export const {
-  signUp,
-  signIn,
-  signOut,
-} = authClient
