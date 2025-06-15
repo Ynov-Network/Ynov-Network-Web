@@ -1,38 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, MessageCircle, Sparkles, Globe, BookOpen, Calendar, Trophy, Play, CheckCircle } from "lucide-react";
 import { Link } from "react-router";
-import LogoHeader from "@/assets/ynov_logo_black.webp"
-import LogoFooter from "@/assets/ynov_logo.webp"
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="px-6 py-4 flex justify-between items-center bg-white shadow-sm border-b border-gray-100">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center">
-            <img height={80} width={80} src={LogoHeader} alt="YNetwork_Logo" />
-          </div>
-        </div>
-        <div className="hidden md:flex items-center space-x-8">
-          <a href="#features" className="text-gray-600 hover:text-ynov-primary transition-colors">Features</a>
-          <a href="#about" className="text-gray-600 hover:text-ynov-primary transition-colors">About</a>
-          <a href="#community" className="text-gray-600 hover:text-ynov-primary transition-colors">Community</a>
-          <a href="#contact" className="text-gray-600 hover:text-ynov-primary transition-colors">Contact</a>
-        </div>
-        <div className="flex space-x-3">
-          <Link to="/sign-in">
-            <Button variant="ghost" className="text-gray-600 hover:text-ynov-primary">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/sign-in">
-            <Button className="bg-gradient-to-r from-ynov-primary to-ynov-secondary text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              Get Started
-            </Button>
-          </Link>
-        </div>
-      </nav>
+     
 
       {/* Hero Section */}
       <section className="relative px-6 py-20 bg-gradient-to-br from-blue-50 via-white to-orange-50 overflow-hidden">
@@ -51,7 +25,7 @@ const Index = () => {
               <span className="text-gray-800">Connect & Learn with</span>
               <br />
               <span className="bg-gradient-to-r from-ynov-primary to-ynov-secondary bg-clip-text text-transparent">
-                YnovNetwork
+                YNetwork
               </span>
             </h1>
 
@@ -302,56 +276,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-12 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center">
-                  <img height={100} width={100} src={LogoFooter} alt="YNetwork_Logo" />
-                </div>
-              </div>
-              <p className="text-gray-400 text-sm">
-                Connecting students, empowering futures.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Platform</h4>
-              <div className="space-y-2 text-sm text-gray-400">
-                <div>Features</div>
-                <div>Community</div>
-                <div>Events</div>
-                <div>Groups</div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <div className="space-y-2 text-sm text-gray-400">
-                <div>Help Center</div>
-                <div>Contact Us</div>
-                <div>Privacy Policy</div>
-                <div>Terms of Service</div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Connect</h4>
-              <div className="space-y-2 text-sm text-gray-400">
-                <div>Campus Locations</div>
-                <div>Student Portal</div>
-                <div>Newsletter</div>
-                <div>Social Media</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            © 2024 YnovNetwork. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 };
