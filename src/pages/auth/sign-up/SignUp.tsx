@@ -39,6 +39,7 @@ function SignUp() {
   });
 
   const onSubmit = async (values: SignUpFormValues) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...submissionValues } = values;
     return await signUpMutation.mutateAsync(submissionValues, {
       onError: (error) => toast.error(`Sign up failed: ${error.message}`),

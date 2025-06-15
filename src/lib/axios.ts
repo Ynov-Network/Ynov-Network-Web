@@ -9,7 +9,6 @@ const axiosConfig: CreateAxiosDefaults = {
     withCredentials: true,
 };
 
-
 const axiosClient: AxiosInstance = axios.create(axiosConfig);
 
 const createServiceClient = (serviceName: string, options?: CreateAxiosDefaults): AxiosInstance => {

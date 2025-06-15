@@ -24,7 +24,12 @@ const signIn = async (data: SignInRequest) => {
   return await authClient.post<SignInRequest>("/sign-in", data);
 };
 
+const signOut = async () => {
+  return await authClient.post("/sign-out");
+};
+
 export {
   signUp,
   signIn,
+  signOut
 };

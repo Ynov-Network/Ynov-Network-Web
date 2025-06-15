@@ -3,15 +3,22 @@ import * as authApi from "./api";
 
 export function useSignUp() {
   return useMutation({
-    mutationKey: ["signup"],
+    mutationKey: ["sign-up"],
     mutationFn: async (data: authApi.SignUpRequest) => await authApi.signUp(data),
   });
 }
 
 export function useSignIn() {
   return useMutation({
-    mutationKey: ["login-user-verification"],
+    mutationKey: ["sign-in"],
     mutationFn: async (data: authApi.SignInRequest) =>
       await authApi.signIn(data)
+  });
+}
+
+export function useSignOut() {
+  return useMutation({
+    mutationKey: ["sign-out"],
+    mutationFn: async () => await authApi.signOut()
   });
 }

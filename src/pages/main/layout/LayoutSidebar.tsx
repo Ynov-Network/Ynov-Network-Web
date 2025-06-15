@@ -40,7 +40,7 @@ const menuItems = [
 
 export function LayoutSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
-  const { open }  = useSidebar()
+  const { open } = useSidebar()
   const { theme } = useTheme();
 
   console.log(open)
@@ -49,16 +49,18 @@ export function LayoutSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className={cn("min-h-max w-full flex items-center justify-between hover:bg-transparent active:bg-transparent focus:bg-transparent", !open && "justify-center")}>
-              <Link to="/feed" className={cn("flex items-center h-max w-max gap-2", !open && "hidden")}>
-                <img className="object-cover" width={80} height={80} src={theme === "light" ? LogoHeaderDark : LogoHeaderLight} alt="YNetwork Logo" />
-              </Link>
-              <SidebarTrigger className="size-5" />
+            <SidebarMenuButton asChild>
+              <div className={cn("min-h-max w-full flex items-center justify-between hover:bg-transparent active:bg-transparent focus:bg-transparent", !open && "justify-center")}>
+                <Link to="/feed" className={cn("flex items-center h-max w-max gap-2", !open && "hidden")}>
+                  <img className="object-cover" width={80} height={80} src={theme === "light" ? LogoHeaderDark : LogoHeaderLight} alt="YNetwork Logo" />
+                </Link>
+                <SidebarTrigger className="size-5" />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent className="px-1.5 md:px-0">

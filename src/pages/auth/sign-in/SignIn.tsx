@@ -18,7 +18,6 @@ import { CustomInput } from "@/components/custom-input";
 import { Mail, Lock } from "lucide-react";
 import { useSignIn } from "@/services/auth/mutation";
 import { useNavigate } from "react-router";
-import { authClient } from "@/lib/auth-client";
 
 const signInSchema = z.object({
   university_email: z.string().email(),

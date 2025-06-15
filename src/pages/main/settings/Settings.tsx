@@ -16,21 +16,28 @@ import {
   Camera
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-// import { useAuth } from "@/contexts/AuthContext";
+import { useGetMyProfile } from "@/services/users/queries";
+import { useUpdateUserProfile, useUpdateProfilePicture, useUpdatePrivacySettings } from "@/services/users/mutation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
-const user = {
-  id: '1',
-  username: 'student.ynov',
-  email: "example@gmail.com",
-  fullName: 'Student Ynov',
-  avatar: `https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face`,
-  bio: 'Computer Science student at Ynov Campus Maroc',
-  followersCount: 142,
-  followingCount: 89
-};
+const profileSchema = z.object({
+  fullName: z.string().min(3, "Full name must be at least 3 characters."),
+  username: z.string().min(3, "Username must be at least 3 characters."),
+  university_email: z.string().email("Invalid email address."),
+  bio: z.string().max(160, "Bio cannot exceed 160 characters.").optional(),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Settings = () => {
-  // const { user } = useAuth();
+  const { data: myProfileData, isLoading } = useGetMyProfile();
+  const user = myProfileData?.data;
+
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
     likes: true,
@@ -39,6 +46,88 @@ const Settings = () => {
     messages: true,
     posts: false
   });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isDirty }
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+  });
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        fullName: `${user.first_name} ${user.last_name}`,
+        username: user.username,
+        university_email: user.university_email, // Assuming email is available in the profile data
+        bio: user.bio,
+      });
+    }
+  }, [user, reset]);
+
+  const updateUserMutation = useUpdateUserProfile();
+  const updateProfilePictureMutation = useUpdateProfilePicture();
+  const updatePrivacySettingsMutation = useUpdatePrivacySettings();
+
+  const onSubmit = (data: ProfileFormValues) => {
+    const [firstName, ...lastNameParts] = data.fullName.split(" ");
+    const lastName = lastNameParts.join(" ");
+
+    updateUserMutation.mutate({
+      first_name: firstName,
+      last_name: lastName,
+      username: data.username,
+      bio: data.bio,
+    }, {
+      onSuccess: () => {
+        toast.success("Profile updated successfully!");
+      },
+      onError: (error) => {
+        toast.error(`Failed to update profile: ${error.message}`);
+      }
+    });
+  };
+
+  const handlePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        updateProfilePictureMutation.mutate({ image: base64String }, {
+          onSuccess: () => {
+            toast.success("Profile picture updated successfully!");
+          },
+          onError: (error) => {
+            toast.error(`Failed to update picture: ${error.message}`);
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePrivacyChange = (isPrivate: boolean) => {
+    updatePrivacySettingsMutation.mutate({
+      account_privacy: isPrivate ? 'private' : 'public',
+    }, {
+      onSuccess: () => {
+        toast.success("Privacy settings updated successfully!");
+        queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+      },
+      onError: (error) => {
+        toast.error(`Failed to update settings: ${error.message}`);
+      }
+    });
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen">
@@ -54,11 +143,11 @@ const Settings = () => {
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback>{user?.fullName?.[0]}</AvatarFallback>
+                    <AvatarImage src={user?.profile_picture_url} />
+                    <AvatarFallback>{user?.first_name?.[0]}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="text-lg font-semibold">{user?.fullName}</h2>
+                    <h2 className="text-lg font-semibold">{user?.first_name} {user?.last_name}</h2>
                     <p className="text-muted-foreground">@{user?.username}</p>
                   </div>
                 </div>
@@ -84,50 +173,60 @@ const Settings = () => {
                       <span>Profile Information</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-center space-x-6">
-                      <div className="relative">
-                        <Avatar className="h-20 w-20">
-                          <AvatarImage src={user?.avatar} />
-                          <AvatarFallback className="text-lg">{user?.fullName?.[0]}</AvatarFallback>
-                        </Avatar>
-                        <Button
-                          size="sm"
-                          className="absolute -bottom-1 -right-1 rounded-full p-2 bg-primary hover:bg-primary/90"
-                        >
-                          <Camera className="h-3 w-3" />
-                        </Button>
+                  <CardContent>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                      <div className="flex items-center space-x-6">
+                        <div className="relative">
+                          <Avatar className="h-20 w-20">
+                            <AvatarImage src={user?.profile_picture_url} />
+                            <AvatarFallback className="text-lg">{user?.first_name[0]}</AvatarFallback>
+                          </Avatar>
+                          <input type="file" id="picture-upload" className="hidden" onChange={handlePictureChange} accept="image/*" />
+                          <label htmlFor="picture-upload">
+                            <Button
+                              size="sm"
+                              className="absolute -bottom-1 -right-1 rounded-full p-2 bg-primary hover:bg-primary/90"
+                              asChild
+                            >
+                              <span><Camera className="h-3 w-3" /></span>
+                            </Button>
+                          </label>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg">{user?.first_name} {user?.last_name}</h3>
+                          <p className="text-gray-600">@{user?.username}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-lg">{user?.fullName}</h3>
-                        <p className="text-gray-600">@{user?.username}</p>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="fullName">Full Name</Label>
+                          <Input id="fullName" {...register("fullName")} />
+                          {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="username">Username</Label>
+                          <Input id="username" {...register("username")} />
+                          {errors.username && <p className="text-red-500 text-xs">{errors.username.message}</p>}
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
-                        <Label htmlFor="fullName">Full Name</Label>
-                        <Input id="fullName" defaultValue={user?.fullName} />
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" type="email" {...register("university_email")} disabled />
+                        {errors.university_email && <p className="text-red-500 text-xs">{errors.university_email.message}</p>}
                       </div>
+
                       <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
-                        <Input id="username" defaultValue={user?.username} />
+                        <Label htmlFor="bio">Bio</Label>
+                        <Input id="bio" {...register("bio")} placeholder="Tell us about yourself..." />
+                        {errors.bio && <p className="text-red-500 text-xs">{errors.bio.message}</p>}
                       </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" defaultValue={user?.email} />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <Input id="bio" defaultValue={user?.bio} placeholder="Tell us about yourself..." />
-                    </div>
-
-                    <Button className="bg-primary hover:bg-primary/90">
-                      Save Changes
-                    </Button>
+                      <Button type="submit" className="bg-primary hover:bg-primary/90" disabled={!isDirty || updateUserMutation.isPending}>
+                        {updateUserMutation.isPending ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </form>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -179,7 +278,11 @@ const Settings = () => {
                         <p className="font-medium">Private Account</p>
                         <p className="text-sm text-gray-600">Only followers can see your posts</p>
                       </div>
-                      <Switch />
+                      <Switch
+                        checked={user?.account_privacy === 'private'}
+                        onCheckedChange={handlePrivacyChange}
+                        disabled={updatePrivacySettingsMutation.isPending}
+                      />
                     </div>
                     <div className="flex items-center justify-between">
                       <div>

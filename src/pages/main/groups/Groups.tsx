@@ -1,84 +1,112 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
-  Users,
-  Plus,
   Search,
-  Filter,
-  MessageCircle,
-  Crown,
-  Lock,
-  Globe,
-  TrendingUp
+  TrendingUp,
+  Plus
 } from "lucide-react";
+import { GroupFormDialog } from "./GroupFormDialog";
+import { GroupDetailsDialog } from "./GroupDetailsDialog";
+import { GroupCard } from "./GroupCard";
+import { useGetAllGroups } from "@/services/groups/queries";
+import { useJoinGroup, useLeaveGroup, useDeleteGroup } from "@/services/groups/mutation";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import type { Group } from "@/services/groups/api";
+import { useDebounce } from "@/hooks/useDebounce";
+
+const GroupCardSkeleton = () => (
+  <Card className="overflow-hidden">
+    <div className="h-32 bg-muted animate-pulse"></div>
+    <CardHeader className="pt-8 pb-3">
+      <div className="h-6 w-3/4 bg-muted rounded animate-pulse mb-2"></div>
+      <div className="h-4 w-1/2 bg-muted rounded animate-pulse"></div>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <div className="h-4 w-full bg-muted rounded animate-pulse"></div>
+      <div className="h-4 w-5/6 bg-muted rounded animate-pulse"></div>
+      <div className="flex items-center justify-between pt-4">
+        <div className="h-10 w-24 bg-muted rounded animate-pulse"></div>
+        <div className="h-10 w-10 bg-muted rounded-full animate-pulse"></div>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 const Groups = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState<string>('All');
+  const [isFormOpen, setFormOpen] = useState(false);
+  const [isDetailsOpen, setDetailsOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
-  const groups = [
-    {
-      id: "1",
-      name: "Web Development Masters",
-      description: "Advanced web development techniques, frameworks, and best practices. Share your projects and get feedback.",
-      members: 245,
-      posts: 1284,
-      privacy: "public",
-      category: "Tech",
-      isJoined: true,
-      isAdmin: false,
-      avatar: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=150&h=150&fit=crop",
-      cover: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
-      recentActivity: "2 hours ago"
-    },
-    {
-      id: "2",
-      name: "Design Thinking Hub",
-      description: "Collaborative space for UI/UX designers and design enthusiasts. Weekly design challenges and portfolio reviews.",
-      members: 156,
-      posts: 892,
-      privacy: "public",
-      category: "Design",
-      isJoined: true,
-      isAdmin: true,
-      avatar: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=150&h=150&fit=crop",
-      cover: "https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=400&h=200&fit=crop",
-      recentActivity: "1 hour ago"
-    },
-    {
-      id: "3",
-      name: "Startup Founders Circle",
-      description: "Exclusive community for aspiring entrepreneurs. Share business ideas, find co-founders, and get mentorship.",
-      members: 89,
-      posts: 456,
-      privacy: "private",
-      category: "Business",
-      isJoined: false,
-      isAdmin: false,
-      avatar: "https://images.unsplash.com/photo-1553028826-f4804151e2e2?w=150&h=150&fit=crop",
-      cover: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=200&fit=crop",
-      recentActivity: "3 hours ago"
-    },
-    {
-      id: "4",
-      name: "AI & Machine Learning",
-      description: "Dive deep into artificial intelligence and machine learning. Research papers, coding challenges, and project collaborations.",
-      members: 198,
-      posts: 734,
-      privacy: "public",
-      category: "Tech",
-      isJoined: false,
-      isAdmin: false,
-      avatar: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=150&h=150&fit=crop",
-      cover: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop",
-      recentActivity: "30 minutes ago"
-    }
-  ];
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const queryClient = useQueryClient();
 
-  const categories = ["All", "Tech", "Design", "Business", "Science", "Art", "Sports"];
+  const { data: groupsData, isLoading } = useGetAllGroups({
+    limit: 100,
+    topic: selectedTopic === 'All' ? undefined : selectedTopic as Group['topic'],
+    q: debouncedSearchQuery,
+  });
+
+  const joinGroupMutation = useJoinGroup();
+  const leaveGroupMutation = useLeaveGroup();
+  const deleteGroupMutation = useDeleteGroup();
+
+  const handleJoinGroup = (groupId: string, groupName: string) => {
+    joinGroupMutation.mutate(groupId, {
+      onSuccess: () => {
+        toast.success(`Successfully joined ${groupName}!`);
+        queryClient.invalidateQueries({ queryKey: ['groups'] });
+      },
+      onError: (err) => toast.error(`Failed to join group: ${(err as Error).message}`),
+    });
+  };
+
+  const handleLeaveGroup = (groupId: string) => {
+    leaveGroupMutation.mutate(groupId, {
+      onSuccess: () => {
+        toast.success("Successfully left the group.");
+        queryClient.invalidateQueries({ queryKey: ['groups'] });
+        setDetailsOpen(false);
+      },
+      onError: (err) => toast.error(`Failed to leave group: ${(err as Error).message}`),
+    });
+  };
+
+  const handleDeleteGroup = (groupId: string) => {
+    deleteGroupMutation.mutate(groupId, {
+      onSuccess: () => {
+        toast.success("Group deleted successfully.");
+        queryClient.invalidateQueries({ queryKey: ['groups'] });
+        setDetailsOpen(false);
+      },
+      onError: (err) => toast.error(`Failed to delete group: ${(err as Error).message}`),
+    })
+  };
+
+  const handleViewDetails = (group: Group) => {
+    setSelectedGroup(group);
+    setDetailsOpen(true);
+  };
+
+  const handleEditGroup = (group: Group) => {
+    setEditingGroup(group);
+    setFormOpen(true);
+  };
+
+  const openCreateForm = () => {
+    setEditingGroup(null);
+    setFormOpen(true);
+  }
+
+  const allGroups = groupsData?.data.groups ?? [];
+  const topics: Array<Group['topic'] | 'All'> = ['All', 'Web Development', 'AI', 'CyberSecurity', 'Data Analytics', 'Games Development'];
 
   return (
     <div className="min-h-screen">
@@ -89,7 +117,7 @@ const Groups = () => {
             <h1 className="text-2xl font-bold gradient-text">Groups</h1>
             <p className="text-muted-foreground">Connect with like-minded students</p>
           </div>
-          <Button className="bg-gradient-brand hover:opacity-90 text-white hover-scale">
+          <Button onClick={openCreateForm} className="bg-gradient-brand hover:opacity-90 text-white hover-scale">
             <Plus className="h-4 w-4 mr-2" />
             Create Group
           </Button>
@@ -110,24 +138,21 @@ const Groups = () => {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" className="px-4">
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
-            </Button>
           </div>
 
           {/* Categories */}
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {categories.map((category) => (
+            {topics.map((topic) => (
               <Badge
-                key={category}
-                variant={category === "All" ? "default" : "secondary"}
-                className={`cursor-pointer whitespace-nowrap hover-scale ${category === "All"
+                key={topic}
+                variant={selectedTopic === topic ? "default" : "secondary"}
+                onClick={() => setSelectedTopic(topic)}
+                className={`cursor-pointer whitespace-nowrap hover-scale ${selectedTopic === topic
                   ? "bg-primary hover:bg-primary/90"
                   : "hover:bg-accent"
                   }`}
               >
-                {category}
+                {topic}
               </Badge>
             ))}
           </div>
@@ -135,112 +160,66 @@ const Groups = () => {
 
         {/* Groups Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {groups.map((group) => (
-            <Card key={group.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover-scale group cursor-pointer">
-              <div className="relative">
-                <img
-                  src={group.cover}
-                  alt={group.name}
-                  className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-3 right-3 flex gap-2">
-                  {group.privacy === "private" ? (
-                    <Badge className="bg-red-500 text-white">
-                      <Lock className="h-3 w-3 mr-1" />
-                      Private
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-green-500 text-white">
-                      <Globe className="h-3 w-3 mr-1" />
-                      Public
-                    </Badge>
-                  )}
-                </div>
-                <Avatar className="absolute -bottom-6 left-4 h-12 w-12 border-4 border-white">
-                  <AvatarImage src={group.avatar} />
-                  <AvatarFallback>{group.name[0]}</AvatarFallback>
-                </Avatar>
-              </div>
-
-              <CardHeader className="pt-8 pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors flex items-center gap-2">
-                      {group.name}
-                      {group.isAdmin && <Crown className="h-4 w-4 text-yellow-500" />}
-                    </CardTitle>
-                    <Badge variant="secondary" className="mt-1">
-                      {group.category}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <div className="flex-1">
-                  <p className="text-muted-foreground text-sm line-clamp-3">{group.description}</p>
-                </div>
-
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-primary" />
-                      <span>{group.members}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4 text-primary" />
-                      <span>{group.posts}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs">
-                    <TrendingUp className="h-3 w-3" />
-                    <span>{group.recentActivity}</span>
-                  </div>
-                </div>
-
-                {group.isJoined ? (
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 border-primary text-primary hover:bg-primary hover:text-white">
-                      View Group
-                    </Button>
-                    <Button variant="outline" size="sm" className="px-3">
-                      <MessageCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Button className="w-full bg-gradient-brand hover:opacity-90 text-white">
-                    {group.privacy === "private" ? "Request to Join" : "Join Group"}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => <GroupCardSkeleton key={i} />)
+          ) : (
+            allGroups.map((group) => (
+              <GroupCard
+                key={group._id}
+                group={group}
+                onJoin={handleJoinGroup}
+                onViewDetails={handleViewDetails}
+                isJoining={joinGroupMutation.isPending && joinGroupMutation.variables === group._id}
+              />
+            ))
+          )}
         </div>
 
         {/* Trending Groups Section */}
         <div className="mt-12">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Trending Groups
+            Discover Groups
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {groups.slice(0, 4).map((group) => (
-              <Card key={`trending-${group.id}`} className="p-4 hover:shadow-md transition-all duration-300 hover-scale cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={group.avatar} />
-                    <AvatarFallback>{group.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-sm truncate hover:text-primary transition-colors">{group.name}</h3>
-                    <p className="text-xs text-muted-foreground">{group.members} members</p>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => <GroupCardSkeleton key={i} />)
+            ) : (
+              allGroups.slice(0, 4).map((group) => (
+                <Card key={`trending-${group._id}`} className="p-4 transition-all duration-300 hover-scale cursor-pointer bg-gradient-to-br from-white via-white to-gray-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/50 border-0 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.12)] dark:hover:shadow-[0_20px_60px_rgb(0,0,0,0.4)] backdrop-blur-sm" onClick={() => handleViewDetails(group)}>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={group.creator_id.profile_picture_url} />
+                      <AvatarFallback>{group.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm truncate hover:text-primary transition-colors">{group.name}</h3>
+                      <p className="text-xs text-muted-foreground">{group.members.length} members</p>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      <GroupFormDialog
+        isOpen={isFormOpen}
+        onOpenChange={setFormOpen}
+        group={editingGroup}
+      />
+
+      <GroupDetailsDialog
+        isOpen={isDetailsOpen}
+        onOpenChange={setDetailsOpen}
+        group={selectedGroup}
+        onEdit={handleEditGroup}
+        onDelete={handleDeleteGroup}
+        onJoin={handleJoinGroup}
+        onLeave={handleLeaveGroup}
+        isJoinLeavePending={joinGroupMutation.isPending || leaveGroupMutation.isPending}
+      />
     </div>
   );
 };

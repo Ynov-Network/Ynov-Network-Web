@@ -4,10 +4,7 @@ export const signUpSchema = z.object({
   first_name: z.string().min(3, "Must be at least 3 characters").max(50),
   last_name: z.string().min(3, "Must be at least 3 characters").max(50),
   username: z.string().min(3, "Must be at least 3 characters").max(20),
-  university_email: z.string().email("Must be a valid email address")
-  .includes("ynov.com", {
-    message: "Email must be a Ynov email (ynov.com)",
-  }),
+  university_email: z.string().email("Must be a valid email address"),
   password: z
     .string()
     .min(8, "At least 8 characters")

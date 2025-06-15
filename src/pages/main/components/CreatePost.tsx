@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,11 +8,12 @@ import {
   Video,
   Smile,
   MapPin,
-  Calendar,
   X
 } from "lucide-react";
-// import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useCreatePost } from "@/services/posts/mutation";
+import { useUploadMedia } from "@/services/upload/mutation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const user = {
   id: '1',
@@ -26,27 +27,82 @@ const user = {
 };
 
 const CreatePost = () => {
+  const queryClient = useQueryClient();
+  const createPostMutation = useCreatePost();
+  const uploadMediaMutation = useUploadMedia();
   // const { user } = useAuth();
   const [content, setContent] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [media, setMedia] = useState<{ id: string, url: string, type: 'image' | 'video' }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = () => {
-    if (!content.trim()) {
-      toast.error("Please write something to share!");
+  const extractHashtags = (text: string): string[] => {
+    const regex = /#(\w+)/g;
+    const matches = text.match(regex);
+    if (matches) {
+      return matches.map(match => match.substring(1));
+    }
+    return [];
+  };
+
+  const handleSubmit = async () => {
+    if (!content.trim() && media.length === 0) {
+      toast.error("Please write something or add media to share!");
       return;
     }
 
-    // Mock post creation
-    toast.success("Post shared successfully!");
-    setContent("");
-    setSelectedImage(null);
-    setIsExpanded(false);
+    const hashtags = extractHashtags(content);
+
+    await createPostMutation.mutateAsync({
+      content,
+      hashtags,
+      media_items: media.map((m, i) => ({ media_id: m.id, display_order: i })),
+      visibility: 'public'
+    }, {
+      onSuccess: () => {
+        toast.success("Post shared successfully!");
+        setContent("");
+        setMedia([]);
+        setIsExpanded(false);
+        queryClient.invalidateQueries({ queryKey: ['feed'] });
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
+        queryClient.invalidateQueries({ queryKey: ['userFeed'] });
+        queryClient.invalidateQueries({ queryKey: ['publicFeed'] });
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to share post: ${error.message}`);
+      }
+    });
   };
 
-  const handleImageSelect = () => {
-    // Mock image selection
-    setSelectedImage("https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop");
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const response = await uploadMediaMutation.mutateAsync(file);
+      const mediaData = response.data.media;
+      const newMedia = {
+        id: mediaData._id,
+        url: mediaData.cdn_url,
+        type: mediaData.file_type.startsWith('image') ? 'image' : 'video' as 'image' | 'video'
+      };
+      setMedia([...media, newMedia]);
+      if (!isExpanded) {
+        setIsExpanded(true);
+      }
+    } catch (error) {
+      toast.error("Failed to upload media.");
+      console.error(error);
+    }
+  };
+
+  const handleRemoveMedia = (id: string) => {
+    setMedia(media.filter(m => m.id !== id));
   };
 
   return (
@@ -70,23 +126,43 @@ const CreatePost = () => {
               rows={isExpanded ? 4 : 2}
             />
 
-            {selectedImage && (
-              <div className="relative mt-4 rounded-lg overflow-hidden">
-                <img
-                  src={selectedImage}
-                  alt="Selected"
-                  className="w-full h-48 object-cover"
-                />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={() => setSelectedImage(null)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+            {media.length > 0 && (
+              <div className="relative mt-4 rounded-lg overflow-hidden grid grid-cols-2 gap-2">
+                {media.map(m => (
+                  <div key={m.id} className="relative">
+                    {m.type === 'image' ? (
+                      <img
+                        src={m.url}
+                        alt="Selected"
+                        className="w-full h-48 object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={m.url}
+                        controls
+                        className="w-full h-48 object-cover"
+                      />
+                    )}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="absolute top-2 right-2 p-1 h-6 w-6"
+                      onClick={() => handleRemoveMedia(m.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             )}
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              className="hidden"
+              accept="image/*,video/*"
+            />
 
             {isExpanded && (
               <div className="space-y-4 my-2">
@@ -96,7 +172,7 @@ const CreatePost = () => {
                     variant="ghost"
                     size="sm"
                     className="text-primary hover:text-primary hover:bg-primary/10"
-                    onClick={handleImageSelect}
+                    onClick={() => fileInputRef.current?.click()}
                   >
                     <Image className="h-5 w-5 mr-2" />
                     Photo
@@ -106,6 +182,7 @@ const CreatePost = () => {
                     variant="ghost"
                     size="sm"
                     className="text-brand-secondary hover:text-brand-secondary hover:bg-brand-secondary/10"
+                    onClick={() => fileInputRef.current?.click()}
                   >
                     <Video className="h-5 w-5 mr-2" />
                     Video
@@ -133,7 +210,7 @@ const CreatePost = () => {
                 {/* Post Actions */}
                 <div className="flex items-center justify-between pt-3 border-t border-border">
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
+                    <span className="h-4 w-4" />
                     <span>Everyone can see this post</span>
                   </div>
 
@@ -143,7 +220,7 @@ const CreatePost = () => {
                       onClick={() => {
                         setIsExpanded(false);
                         setContent("");
-                        setSelectedImage(null);
+                        setMedia([]);
                       }}
                     >
                       Cancel
@@ -152,9 +229,10 @@ const CreatePost = () => {
                     <Button
                       className="bg-gradient-brand hover:opacity-90 text-white hover-scale"
                       onClick={handleSubmit}
-                      disabled={!content.trim()}
+                      disabled={createPostMutation.isPending || uploadMediaMutation.isPending || (!content.trim() && media.length === 0)}
+                    // loading={createPostMutation.isPending || uploadMediaMutation.isPending}
                     >
-                      Share Post
+                      {createPostMutation.isPending || uploadMediaMutation.isPending ? "Sharing..." : "Share Post"}
                     </Button>
                   </div>
                 </div>

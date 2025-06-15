@@ -1,333 +1,331 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Bell,
-  Heart,
-  MessageCircle,
-  UserPlus,
-  Calendar,
-  Trophy,
-  Settings,
   Check,
-  X,
-  MoreHorizontal
+  Trash2,
+  CheckCheck,
+  MessageCircle,
+  Heart,
+  UserPlus,
+  Users,
+  CalendarPlus,
 } from "lucide-react";
+import { useGetNotifications } from "@/services/notifications/queries";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  useMarkAllAsRead,
+  useMarkAsRead,
+  useDeleteNotification,
+} from "@/services/notifications/mutation";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn, formatRelativeTime } from "@/lib/utils";
+import type { Notification } from "@/services/notifications/api";
+import { Link } from "react-router";
 
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([
-    {
-      id: "1",
-      type: "like",
-      title: "Sarah Chen liked your post",
-      message: "Your post about the AI workshop received a like",
-      timestamp: "2 minutes ago",
-      read: false,
-      avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face",
-      actionable: false
-    },
-    {
-      id: "2",
-      type: "comment",
-      title: "Alex Rodriguez commented on your post",
-      message: "Great insights! I'd love to collaborate on this project.",
-      timestamp: "15 minutes ago",
-      read: false,
-      avatar: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=150&h=150&fit=crop&crop=face",
-      actionable: false
-    },
-    {
-      id: "3",
-      type: "follow",
-      title: "Maria Gonzalez started following you",
-      message: "You have a new follower",
-      timestamp: "1 hour ago",
-      read: false,
-      avatar: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=150&h=150&fit=crop&crop=face",
-      actionable: true
-    },
-    {
-      id: "4",
-      type: "event",
-      title: "Reminder: AI Workshop tomorrow",
-      message: "Don't forget about the AI & Machine Learning Workshop starting at 2 PM",
-      timestamp: "3 hours ago",
-      read: true,
-      avatar: null,
-      actionable: false
-    },
-    {
-      id: "5",
-      type: "achievement",
-      title: "You earned a new badge!",
-      message: "Congratulations! You've received the 'Active Contributor' badge",
-      timestamp: "1 day ago",
-      read: true,
-      avatar: null,
-      actionable: false
-    }
-  ]);
+  const queryClient = useQueryClient();
+  const { data: notificationsData, isLoading } =
+    useGetNotifications({ filter: "all" });
+  const notifications = notificationsData?.data.notifications ?? [];
 
-  const getNotificationIcon = (type: string) => {
+  const markAsReadMutation = useMarkAsRead();
+  const markAllAsReadMutation = useMarkAllAsRead();
+  const deleteNotificationMutation = useDeleteNotification();
+
+  const handleMarkAsRead = (id: string) => {
+    markAsReadMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Notification marked as read.");
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      },
+      onError: () => toast.error("Failed to mark as read."),
+    });
+  };
+
+  const handleMarkAllAsRead = () => {
+    markAllAsReadMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success("All notifications marked as read.");
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      },
+      onError: () => toast.error("Failed to mark all as read."),
+    });
+  };
+
+  const handleDeleteNotification = (id: string) => {
+    deleteNotificationMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Notification deleted.");
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete notification: ${error.message}`);
+      },
+    });
+  };
+
+  const renderNotificationIcon = (type: string) => {
+    const iconProps = {
+      className: "h-5 w-5 text-primary-foreground",
+    };
     switch (type) {
-      case "like":
-        return <Heart className="h-4 w-4 text-red-500" />;
-      case "comment":
-        return <MessageCircle className="h-4 w-4 text-blue-500" />;
+      case "new_message":
+        return <MessageCircle {...iconProps} />;
       case "follow":
-        return <UserPlus className="h-4 w-4 text-green-500" />;
-      case "event":
-        return <Calendar className="h-4 w-4 text-purple-500" />;
-      case "achievement":
-        return <Trophy className="h-4 w-4 text-yellow-500" />;
+        return <UserPlus {...iconProps} />;
+      case "like":
+        return <Heart {...iconProps} />;
+      case "new_event":
+        return <CalendarPlus {...iconProps} />;
+      case "new_group":
+      case "group_join":
+        return <Users {...iconProps} />;
       default:
-        return <Bell className="h-4 w-4 text-muted-foreground" />;
+        return <Bell {...iconProps} />;
     }
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id ? { ...notif, read: true } : notif
-      )
+  const renderNotificationContent = (notification: Notification) => {
+    const actorName = `${notification.actor_id.first_name} ${notification.actor_id.last_name}`;
+    switch (notification.type) {
+      case 'new_message':
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> sent you a message.
+          </p>
+        );
+      case 'follow':
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> started following you.
+          </p>
+        );
+      case 'like':
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> liked your post.
+            {notification.target_entity_ref && (
+              <span className="text-muted-foreground ml-1 italic">
+                "{truncate(notification.target_entity_ref, 40)}"
+              </span>
+            )}
+          </p>
+        );
+      case 'comment':
+        return (
+          <div>
+            <p>
+              <span className="font-semibold">{actorName}</span> commented on your post.
+            </p>
+            <p className="mt-1 p-2 bg-accent rounded-md text-sm italic">
+              "{notification.content}"
+            </p>
+          </div>
+        );
+      case 'new_event':
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> created a new
+            event:{" "}
+            <span className="italic">
+              "{truncate(notification.content ?? "", 40)}"
+            </span>
+          </p>
+        );
+      case 'new_group':
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> created a new
+            group:{" "}
+            <span className="italic">
+              "{truncate(notification.content ?? "", 40)}"
+            </span>
+          </p>
+        );
+      case 'group_join':
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> joined the group:{" "}
+            <span className="italic">
+              "{truncate(notification.content ?? "", 40)}"
+            </span>
+          </p>
+        );
+      default:
+        return (
+          <p>
+            <span className="font-semibold">{actorName}</span> {notification.content}
+          </p>
+        );
+    }
+  }
+
+  const renderNotificationList = (list: Notification[]) => {
+    if (list.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Bell className="h-12 w-12 mx-auto text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">No notifications yet</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We'll let you know when something new happens.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        {list.map((notification) => {
+          const notificationContent = (
+            <div
+              className={cn(
+                "flex items-start gap-4 p-4 rounded-lg transition-colors",
+                notification.is_read
+                  ? "bg-transparent"
+                  : "bg-primary/5 hover:bg-primary/10"
+              )}
+            >
+              <div
+                className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary to-brand-secondary`}
+              >
+                {renderNotificationIcon(notification.type)}
+              </div>
+              <div className="flex-1">
+                {renderNotificationContent(notification)}
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatRelativeTime(notification.createdAt)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {!notification.is_read && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleMarkAsRead(notification._id);
+                    }}
+                    disabled={markAsReadMutation.isPending}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    handleDeleteNotification(notification._id)
+                  }}
+                  disabled={deleteNotificationMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          );
+
+          if (notification.type === 'new_message' && notification.target_entity_id) {
+            return (
+              <Link to={`/chat?conversationId=${notification.target_entity_id}`} key={notification._id}>
+                {notificationContent}
+              </Link>
+            )
+          }
+
+          if ((notification.type === 'like' || notification.type === 'comment') && notification.target_entity_id) {
+            return (
+              <Link to={`/post/${notification.target_entity_id}`} key={notification._id}>
+                {notificationContent}
+              </Link>
+            )
+          }
+
+          if (notification.type === 'follow') {
+            return (
+              <Link to={`/profile/${notification.actor_id.username}`} key={notification._id}>
+                {notificationContent}
+              </Link>
+            )
+          }
+
+          if (notification.type === 'new_event') {
+            return (
+              <Link to={`/events`} key={notification._id}>
+                {notificationContent}
+              </Link>
+            )
+          }
+
+          if (notification.type === 'new_group' || notification.type === 'group_join') {
+            return (
+              <Link to={`/groups`} key={notification._id}>
+                {notificationContent}
+              </Link>
+            )
+          }
+
+          return (
+            <div key={notification._id}>
+              {notificationContent}
+            </div>
+          )
+        })}
+      </div>
     );
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+  const truncate = (str: string, n: number) => {
+    return (str.length > n) ? str.slice(0, n - 1) + '...' : str;
   };
-
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
-  };
-
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen w-full">
-      {/* Header */}
+    <div className="min-h-screen">
       <header className="bg-background border-b border-border px-6 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Bell className="h-6 w-6 text-primary" />
-              {unreadCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs p-0 flex items-center justify-center">
-                  {unreadCount}
-                </Badge>
-              )}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
-              <p className="text-muted-foreground">Stay updated with your activity</p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold gradient-text">Notifications</h1>
+            <p className="text-muted-foreground">
+              Stay up to date with your account activity.
+            </p>
           </div>
-          <div className="flex gap-2">
-            {unreadCount > 0 && (
-              <Button variant="outline" onClick={markAllAsRead} className="hover-scale">
-                <Check className="h-4 w-4 mr-2" />
-                Mark all as read
-              </Button>
-            )}
-            <Button variant="outline" className="hover-scale">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
-          </div>
+          <Button
+            onClick={handleMarkAllAsRead}
+            disabled={
+              markAllAsReadMutation.isPending ||
+              notifications.every((n) => n.is_read)
+            }
+          >
+            <CheckCheck className="h-4 w-4 mr-2" />
+            Mark all as read
+          </Button>
         </div>
       </header>
-
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              All ({notifications.length})
-            </TabsTrigger>
-            <TabsTrigger value="unread" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Unread ({unreadCount})
-            </TabsTrigger>
-            <TabsTrigger value="mentions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Mentions
-            </TabsTrigger>
-            <TabsTrigger value="events" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Events
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="all" className="space-y-4">
-            {notifications.length === 0 ? (
-              <Card className="p-8 text-center">
-                <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No notifications yet</h3>
-                <p className="text-muted-foreground">When you get notifications, they'll show up here.</p>
-              </Card>
+      <main className="p-6">
+        <Card>
+          <CardContent className="p-0">
+            {isLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
-              notifications.map((notification) => (
-                <Card
-                  key={notification.id}
-                  className={`transition-all duration-300 hover:shadow-md hover-scale cursor-pointer ${!notification.read ? 'bg-primary/5 border-l-4 border-l-primary' : ''
-                    }`}
-                  onClick={() => !notification.read && markAsRead(notification.id)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="relative flex-shrink-0">
-                        {notification.avatar ? (
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={notification.avatar} />
-                            <AvatarFallback>U</AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <div className="h-12 w-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                        )}
-                        <div className="absolute -bottom-1 -right-1 bg-card rounded-full p-1 shadow-sm">
-                          {getNotificationIcon(notification.type)}
-                        </div>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <h3 className={`font-medium ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                              {notification.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              {notification.timestamp}
-                            </p>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                {!notification.read && (
-                                  <DropdownMenuItem onClick={() => markAsRead(notification.id)}>
-                                    <Check className="h-4 w-4 mr-2" />
-                                    Mark as read
-                                  </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem
-                                  onClick={() => deleteNotification(notification.id)}
-                                  className="text-red-600 hover:text-red-700"
-                                >
-                                  <X className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </div>
-
-                        {notification.actionable && notification.type === "follow" && (
-                          <div className="flex gap-2 mt-3">
-                            <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                              Follow Back
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              View Profile
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+              renderNotificationList(notifications)
             )}
-          </TabsContent>
-
-          <TabsContent value="unread" className="space-y-4">
-            {notifications.filter(n => !n.read).map((notification) => (
-              <Card
-                key={notification.id}
-                className="bg-primary/5 border-l-4 border-l-primary transition-all duration-300 hover:shadow-md hover-scale cursor-pointer"
-                onClick={() => markAsRead(notification.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="relative flex-shrink-0">
-                      {notification.avatar ? (
-                        <Avatar className="h-12 w-12">
-                          <AvatarImage src={notification.avatar} />
-                          <AvatarFallback>U</AvatarFallback>
-                        </Avatar>
-                      ) : (
-                        <div className="h-12 w-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center">
-                          {getNotificationIcon(notification.type)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                      <p className="text-xs text-muted-foreground mt-2">{notification.timestamp}</p>
-                    </div>
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {notifications.filter(n => !n.read).length === 0 && (
-              <Card className="p-8 text-center">
-                <Check className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">All caught up!</h3>
-                <p className="text-muted-foreground">You have no unread notifications.</p>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="mentions" className="space-y-4">
-            <Card className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">No mentions yet</h3>
-              <p className="text-muted-foreground">When someone mentions you, you'll see it here.</p>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="events" className="space-y-4">
-            {notifications.filter(n => n.type === "event").map((notification) => (
-              <Card key={notification.id} className="transition-all duration-300 hover:shadow-md hover-scale">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <Calendar className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                      <p className="text-xs text-muted-foreground mt-2">{notification.timestamp}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
-        </Tabs>
-      </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 };

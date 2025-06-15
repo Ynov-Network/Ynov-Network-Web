@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -11,113 +10,31 @@ import {
   Filter,
   Folder,
   Plus,
-  MoreHorizontal,
-  Heart,
-  MessageCircle,
-  Image as ImageIcon,
   FileText,
-  Video,
+  ImageIcon,
   Calendar
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useGetSavedPosts } from "@/services/saved-posts/queries";
+import { useDebounce } from "@/hooks/useDebounce";
+import PostCard from "../components/PostCard";
+import { PostCardSkeleton } from "../components/PostCardSkeleton";
 
 const SavedPosts = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const savedItems = [
-    {
-      id: "1",
-      type: "post",
-      title: "10 Essential JavaScript Tips for Beginners",
-      content: "Master these fundamental JavaScript concepts to become a better developer...",
-      author: {
-        username: "codemaster",
-        fullName: "Alex Rodriguez",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-      },
-      savedDate: "2024-12-10",
-      folder: "Programming",
-      tags: ["javascript", "programming", "tips"],
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop",
-      likes: 234,
-      comments: 45
-    },
-    {
-      id: "2",
-      type: "event",
-      title: "AI & Machine Learning Workshop",
-      content: "Join us for an intensive workshop on the latest AI technologies and practical applications...",
-      author: {
-        username: "ai.society",
-        fullName: "AI Society",
-        avatar: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=150&h=150&fit=crop&crop=face"
-      },
-      savedDate: "2024-12-08",
-      folder: "Events",
-      tags: ["ai", "workshop", "learning"],
-      eventDate: "2024-12-15",
-      location: "Tech Hub"
-    },
-    {
-      id: "3",
-      type: "article",
-      title: "The Future of Web Design: Trends for 2025",
-      content: "Explore the emerging design trends that will shape the web in 2025, from AI-powered interfaces to sustainable design practices...",
-      author: {
-        username: "design.guru",
-        fullName: "Maya Chen",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
-      },
-      savedDate: "2024-12-07",
-      folder: "Design",
-      tags: ["design", "trends", "web"],
-      image: "https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=400&h=200&fit=crop",
-      readTime: "8 min read"
-    },
-    {
-      id: "4",
-      type: "video",
-      title: "React Best Practices Tutorial",
-      content: "Learn advanced React patterns and best practices in this comprehensive video tutorial...",
-      author: {
-        username: "react.teacher",
-        fullName: "David Kim",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-      },
-      savedDate: "2024-12-05",
-      folder: "Programming",
-      tags: ["react", "tutorial", "bestpractices"],
-      duration: "45:30",
-      thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop"
-    }
-  ];
+  const { data: savedPostsData, isLoading } = useGetSavedPosts({
+    q: debouncedSearchQuery,
+    limit: 50,
+  });
+  const savedItems = savedPostsData?.data.posts ?? [];
 
   const folders = [
     { name: "All Items", count: savedItems.length, icon: Bookmark },
-    { name: "Programming", count: 2, icon: FileText },
-    { name: "Design", count: 1, icon: ImageIcon },
-    { name: "Events", count: 1, icon: Calendar }
+    { name: "Programming", count: 0, icon: FileText },
+    { name: "Design", count: 0, icon: ImageIcon },
+    { name: "Events", count: 0, icon: Calendar }
   ];
-
-  const getItemIcon = (type: string) => {
-    switch (type) {
-      case "post":
-        return <FileText className="h-4 w-4 text-blue-500" />;
-      case "event":
-        return <Calendar className="h-4 w-4 text-green-500" />;
-      case "article":
-        return <FileText className="h-4 w-4 text-purple-500" />;
-      case "video":
-        return <Video className="h-4 w-4 text-red-500" />;
-      default:
-        return <Bookmark className="h-4 w-4 text-gray-500" />;
-    }
-  };
 
   return (
     <div className="min-h-screen">
@@ -171,7 +88,7 @@ const SavedPosts = () => {
 
           {/* Quick Stats */}
           <Card>
-            <CardContent >
+            <CardContent>
               <h3 className="font-semibold mb-3">Quick Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -180,7 +97,7 @@ const SavedPosts = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">This Week</span>
-                  <span className="font-medium">3</span>
+                  <span className="font-medium">0</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">This Month</span>
@@ -213,204 +130,27 @@ const SavedPosts = () => {
           </div>
 
           <Tabs defaultValue="grid" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="grid" className="data-[state=active]:bg-primary data-[state=active]:text-white">
                 Grid View
               </TabsTrigger>
               <TabsTrigger value="list" className="data-[state=active]:bg-primary data-[state=active]:text-white">
                 List View
               </TabsTrigger>
-              <TabsTrigger value="timeline" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-                Timeline
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="grid" className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {savedItems.map((item) => (
-                <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover-scale group cursor-pointer">
-                  {(item.image || item.thumbnail) && (
-                    <div className="relative">
-                      <img
-                        src={item.image || item.thumbnail}
-                        alt={item.title}
-                        className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-3 right-3 flex gap-2">
-                        <Badge className="bg-background/90 text-foreground">
-                          {getItemIcon(item.type)}
-                          <span className="ml-1 capitalize">{item.type}</span>
-                        </Badge>
-                      </div>
-                      {item.duration && (
-                        <Badge className="absolute bottom-3 right-3 bg-black/70 text-white">
-                          {item.duration}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
-                        {item.title}
-                      </h3>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                          <DropdownMenuItem>Share</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">Remove</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground line-clamp-2">{item.content}</p>
-
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={item.author.avatar} />
-                        <AvatarFallback>{item.author.fullName[0]}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-xs text-muted-foreground">{item.author.fullName}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Saved {new Date(item.savedDate).toLocaleDateString()}</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {item.folder}
-                      </Badge>
-                    </div>
-
-                    {item.type === "post" && (
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-                        <div className="flex items-center gap-1">
-                          <Heart className="h-3 w-3" />
-                          {item.likes}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="h-3 w-3" />
-                          {item.comments}
-                        </div>
-                      </div>
-                    )}
-
-                    {item.type === "event" && (
-                      <div className="text-xs text-muted-foreground pt-2 border-t">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(item.eventDate!).toLocaleDateString()}
-                        </div>
-                      </div>
-                    )}
-
-                    {item.readTime && (
-                      <div className="text-xs text-muted-foreground pt-2 border-t">
-                        {item.readTime}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+              {isLoading
+                ? Array.from({ length: 6 }).map((_, i) => <PostCardSkeleton key={i} />)
+                : savedItems.map((post) => <PostCard key={post._id} post={post} />)
+              }
             </TabsContent>
 
             <TabsContent value="list" className="space-y-4">
-              {savedItems.map((item) => (
-                <Card key={item.id} className="hover:shadow-md transition-all duration-300 hover-scale cursor-pointer">
-                  <CardContent>
-                    <div className="flex gap-4">
-                      {(item.image || item.thumbnail) && (
-                        <img
-                          src={item.image || item.thumbnail}
-                          alt={item.title}
-                          className="w-24 h-16 object-cover rounded-lg flex-shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              {getItemIcon(item.type)}
-                              <h3 className="font-semibold hover:text-primary transition-colors">
-                                {item.title}
-                              </h3>
-                            </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{item.content}</p>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Avatar className="h-4 w-4">
-                                  <AvatarImage src={item.author.avatar} />
-                                  <AvatarFallback>{item.author.fullName[0]}</AvatarFallback>
-                                </Avatar>
-                                {item.author.fullName}
-                              </div>
-                              <span>•</span>
-                              <span>Saved {new Date(item.savedDate).toLocaleDateString()}</span>
-                              <span>•</span>
-                              <Badge variant="secondary" className="text-xs">
-                                {item.folder}
-                              </Badge>
-                            </div>
-                          </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                              <DropdownMenuItem>Share</DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600">Remove</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="timeline" className="space-y-6">
-              <div className="relative">
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border"></div>
-                {savedItems.map((item) => (
-                  <div key={item.id} className="relative flex gap-6 pb-6">
-                    <div className="relative z-10 w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                      {getItemIcon(item.type)}
-                    </div>
-                    <Card className="flex-1 hover:shadow-md transition-all duration-300 hover-scale cursor-pointer">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold hover:text-primary transition-colors">
-                            {item.title}
-                          </h3>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(item.savedDate).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.content}</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={item.author.avatar} />
-                              <AvatarFallback>{item.author.fullName[0]}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm text-muted-foreground">{item.author.fullName}</span>
-                          </div>
-                          <Badge variant="secondary" className="text-xs">
-                            {item.folder}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                ))}
-              </div>
+              {isLoading
+                ? Array.from({ length: 6 }).map((_, i) => <PostCardSkeleton key={i} />)
+                : savedItems.map((post) => <PostCard key={post._id} post={post} />)
+              }
             </TabsContent>
           </Tabs>
         </div>

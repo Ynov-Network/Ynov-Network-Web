@@ -1,88 +1,93 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MapPin,
   Calendar,
-  Link as LinkIcon,
   MoreHorizontal,
   MessageCircle,
   UserPlus,
-  Settings
+  Settings,
+  Image as ImageIcon
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import PostCard from "../components/PostCard";
-// import { useAuth } from "@/contexts/AuthContext";
-
-const user = {
-  id: '1',
-  username: 'student.ynov',
-  email: "example@gmail.com",
-  fullName: 'Student Ynov',
-  avatar: `https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face`,
-  bio: 'Computer Science student at Ynov Campus Maroc',
-  followersCount: 142,
-  followingCount: 89
-};
+import { useGetMyProfile, useGetUserProfile } from "@/services/users/queries";
+import { useFollowUser, useUnfollowUser } from "@/services/follow/mutation";
+import { PostCardSkeleton } from "../components/PostCardSkeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useGetPostsByUser } from "@/services/posts/queries";
 
 const Profile = () => {
-  const { username } = useParams();
-  // const user = useAuth();
-  const [isFollowing, setIsFollowing] = useState(false);
+  const { userId } = useParams<{ userId: string }>();
+  const queryClient = useQueryClient();
 
-  const isOwnProfile = !username || username === user?.username;
+  const { data: myProfileData, isLoading: isMyProfileLoading } = useGetMyProfile();
+  const { data: userProfileData, isLoading: isUserProfileLoading } = useGetUserProfile(userId as string, {
+    enabled: !!userId,
+  });
 
-  // Mock user data
-  const profileUser = {
-    id: "1",
-    username: "student.ynov",
-    fullName: "Student Ynov",
-    bio: "Computer Science student at Ynov Campus Maroc 🎓 | Passionate about web development and AI | Building cool projects ✨",
-    avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face",
-    coverImage: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&h=300&fit=crop",
-    location: "Casablanca, Morocco",
-    website: "https://portfolio.student.dev",
-    joinedDate: "September 2023",
-    followersCount: 142,
-    followingCount: 89,
-    postsCount: 24,
-    verified: true
+  const myProfile = myProfileData?.data;
+  const userProfile = userId ? userProfileData?.data : myProfile;
+  const isLoading = userId ? isUserProfileLoading : isMyProfileLoading;
+
+  const { data: postsData, isLoading: arePostsLoading } = useGetPostsByUser(userProfile?._id ?? '', {
+    enabled: !!userProfile?._id,
+  });
+  const userPosts = postsData?.data.posts ?? [];
+
+  const followMutation = useFollowUser();
+  const unfollowMutation = useUnfollowUser();
+
+  const handleFollowToggle = () => {
+    if (!userProfile) return;
+    const mutation = userProfile.is_following ? unfollowMutation : followMutation;
+    mutation.mutate(userProfile._id, {
+      onSuccess: () => {
+        toast.success(userProfile.is_following ? `Unfollowed @${userProfile?.username}` : `Followed @${userProfile?.username}`);
+        queryClient.invalidateQueries({ queryKey: ["user-profile", userId] });
+        queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+      },
+      onError: (error) => {
+        toast.error(`An error occurred: ${error.message}`);
+      }
+    });
   };
 
-  // Mock posts data
-  const userPosts = [
-    {
-      id: "1",
-      author: {
-        username: profileUser.username,
-        fullName: profileUser.fullName,
-        avatar: profileUser.avatar
-      },
-      content: "Just deployed my first React application! The journey from zero to deployment was incredible. Thanks to all my classmates who helped me debug along the way 🚀",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-      likes: 45,
-      comments: 12,
-      shares: 8,
-      timestamp: "1 day ago",
-      tags: ["react", "webdev", "achievement"]
-    },
-    {
-      id: "2",
-      author: {
-        username: profileUser.username,
-        fullName: profileUser.fullName,
-        avatar: profileUser.avatar
-      },
-      content: "Excited to start my internship at a local tech startup next month! Looking forward to applying everything I've learned at Ynov in a real-world setting.",
-      likes: 67,
-      comments: 23,
-      shares: 15,
-      timestamp: "3 days ago",
-      tags: ["internship", "career", "excited"]
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <div className="flex-1 mb-6 mx-4">
+          <div className="relative h-48 md:h-64 bg-muted animate-pulse"></div>
+          <div className="bg-card">
+            <div className="px-6 pb-6">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between -mt-10 md:-mt-16">
+                <div className="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-6">
+                  <div className="h-32 w-32 rounded-full bg-muted border-4 border-card shadow-lg animate-pulse"></div>
+                  <div className="md:mt-0">
+                    <div className="h-8 w-48 bg-muted rounded animate-pulse"></div>
+                    <div className="h-6 w-32 bg-muted rounded mt-2 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="flex space-x-3 mt-4 md:mt-0">
+                  <div className="h-10 w-32 bg-muted rounded animate-pulse"></div>
+                  <div className="h-10 w-24 bg-muted rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return <div>User not found</div>
+  }
+
+  const isOwnProfile = !userId || myProfile?._id === userProfile._id;
+
 
   return (
     <div className="min-h-screen">
@@ -90,7 +95,7 @@ const Profile = () => {
         {/* Cover Image */}
         <div className="relative h-48 md:h-64 bg-gradient-brand">
           <img
-            src={profileUser.coverImage}
+            src={"https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&h=300&fit=crop"}
             alt="Cover"
             className="w-full h-full object-cover"
           />
@@ -104,20 +109,17 @@ const Profile = () => {
               {/* Avatar and Basic Info */}
               <div className="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-6">
                 <Avatar className="h-32 w-32 border-4 border-card shadow-lg">
-                  <AvatarImage src={profileUser.avatar} />
+                  <AvatarImage src={userProfile.profile_picture_url} />
                   <AvatarFallback className="bg-gradient-brand text-primary-foreground text-2xl font-bold">
-                    {profileUser.fullName[0]}
+                    {userProfile.first_name[0]}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="md:mt-0">
                   <div className="flex items-center space-x-2">
-                    <h1 className="text-2xl font-bold">{profileUser.fullName}</h1>
-                    {profileUser.verified && (
-                      <Badge className="bg-primary text-primary-foreground">Verified</Badge>
-                    )}
+                    <h1 className="text-2xl font-bold">{userProfile.first_name} {userProfile.last_name}</h1>
                   </div>
-                  <p className="text-muted-foreground">@{profileUser.username}</p>
+                  <p className="text-muted-foreground">@{userProfile.username}</p>
                 </div>
               </div>
 
@@ -137,11 +139,12 @@ const Profile = () => {
                       Message
                     </Button>
                     <Button
-                      className={`${isFollowing ? 'bg-muted text-muted-foreground hover:bg-accent' : 'bg-gradient-brand hover:opacity-90 text-white'}`}
-                      onClick={() => setIsFollowing(!isFollowing)}
+                      className={`${userProfile.is_following ? 'bg-muted text-muted-foreground hover:bg-accent' : 'bg-gradient-brand hover:opacity-90 text-white'}`}
+                      onClick={handleFollowToggle}
+                      disabled={followMutation.isPending || unfollowMutation.isPending}
                     >
                       <UserPlus className="h-4 w-4 mr-2" />
-                      {isFollowing ? 'Following' : 'Follow'}
+                      {userProfile.is_following ? 'Following' : 'Follow'}
                     </Button>
                   </>
                 )}
@@ -153,33 +156,33 @@ const Profile = () => {
 
             {/* Bio and Details */}
             <div className="mt-4 space-y-4">
-              <p className="text-foreground leading-relaxed max-w-2xl">{profileUser.bio}</p>
+              <p className="text-foreground leading-relaxed max-w-2xl">{userProfile.bio}</p>
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <MapPin className="h-4 w-4" />
-                  <span>{profileUser.location}</span>
+                  <span>{userProfile.city}, {userProfile.country}</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                {/* <div className="flex items-center space-x-1">
                   <LinkIcon className="h-4 w-4" />
-                  <a href={profileUser.website} className="text-primary hover:underline">
+                  <a href={userProfile.website} className="text-primary hover:underline">
                     portfolio.student.dev
                   </a>
-                </div>
+                </div> */}
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>Joined {profileUser.joinedDate}</span>
+                  <span>Joined {new Date(userProfile.date_joined).toLocaleDateString()}</span>
                 </div>
               </div>
 
               {/* Stats */}
               <div className="flex space-x-6 text-sm">
                 <div className="flex space-x-1">
-                  <span className="font-semibold">{profileUser.followingCount}</span>
+                  <span className="font-semibold">{userProfile.following_count}</span>
                   <span className="text-muted-foreground">Following</span>
                 </div>
                 <div className="flex space-x-1">
-                  <span className="font-semibold">{profileUser.followersCount}</span>
+                  <span className="font-semibold">{userProfile.follower_count}</span>
                   <span className="text-muted-foreground">Followers</span>
                 </div>
               </div>
@@ -213,28 +216,31 @@ const Profile = () => {
 
             <div>
               <TabsContent value="posts" className="space-y-6 mt-0">
-                {userPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
+                {arePostsLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)
+                ) : userPosts.length > 0 ? (
+                  userPosts.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    This user hasn't posted anything yet.
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="media" className="mt-0">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {[1, 2, 3, 4, 5, 6].map((item) => (
-                    <div key={item} className="aspect-square bg-muted rounded-lg hover:opacity-80 transition-opacity cursor-pointer">
-                      <img
-                        src={`https://images.unsplash.com/photo-${1581091226825 + item}?w=300&h=300&fit=crop`}
-                        alt={`Media ${item}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                  ))}
+                  <div className="text-center py-12 text-muted-foreground col-span-full">
+                    <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground" />
+                    <p className="mt-4">This user hasn't posted any media yet.</p>
+                  </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="likes" className="mt-0">
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">Liked posts will appear here</p>
+                <div className="text-center py-12 text-muted-foreground">
+                  Liked posts will appear here
                 </div>
               </TabsContent>
             </div>
