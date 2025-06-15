@@ -131,6 +131,15 @@ const Index = () => {
           </div>
         </nav>
       </header>
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+     
+
+      {/* Hero Section */}
+      <section className="relative px-6 py-20 bg-gradient-to-br from-blue-50 via-white to-orange-50 overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full opacity-20 animate-float"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-20 animate-[float_4s_ease-in-out_infinite_reverse]"></div>
 
       <main>
         <section className="px-6 py-20 md:py-32 relative overflow-hidden bg-background bg-aurora-soft">
@@ -152,6 +161,13 @@ const Index = () => {
                   <Sparkles className="h-4 w-4 mr-2 text-primary" />
                   Exclusively for Ynov Campus
                 </Badge>
+            <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+              <span className="text-gray-800">Connect & Learn with</span>
+              <br />
+              <span className="bg-gradient-to-r from-ynov-primary to-ynov-secondary bg-clip-text text-transparent">
+                YNetwork
+              </span>
+            </h1>
 
                 <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter">
                   <span className="text-foreground">Your Campus,</span>
@@ -440,6 +456,28 @@ const Index = () => {
           &copy; {new Date().getFullYear()} Ynov Network. All Rights Reserved.
         </div>
       </footer>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="px-6 py-20 bg-gradient-to-r from-ynov-primary to-ynov-secondary">
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <h2 className="text-4xl font-bold mb-6">
+            Ready to Transform Your Student Experience?
+          </h2>
+          <p className="text-xl mb-10 opacity-90">
+            Join thousands of students who are already building connections and achieving success together.
+          </p>
+          <Link to="/sign-up">
+            <Button size="lg" className="bg-white text-ynov-primary hover:bg-gray-100 px-10 py-4 font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              Get Started Free
+              <Sparkles className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+      {/* Footer */}
+      
     </div>
   );
 };
