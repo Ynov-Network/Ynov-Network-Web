@@ -17,7 +17,7 @@ import {
   Users,
   CalendarPlus,
 } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useTheme } from "@/components/theme-provider";
 // import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -34,20 +34,22 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { socket } from "@/lib/socket";
 import { toast } from "sonner";
+import { useSignOut } from "@/services/auth/mutation";
 
 export const LayoutHeader = () => {
   // const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const { isMobile } = useSidebar();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data: profileData } = useGetMyProfile();
+  const signOutMutation = useSignOut();
   const user = profileData?.data;
 
   const { data: notificationsData } = useGetNotifications({ limit: 10 });
   const notifications = notificationsData?.data.notifications ?? [];
-  const unreadNotificationsCount =
-    notifications.filter((n) => !n.is_read).length ?? 0;
+  const unreadNotificationsCount = notifications.filter((n) => !n.is_read).length ?? 0;
 
   useEffect(() => {
     if (!user?._id) return;
@@ -73,6 +75,20 @@ export const LayoutHeader = () => {
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
+
+  const handleSignOut = async () => {
+    return signOutMutation.mutateAsync(undefined, {
+      onSuccess: () => {
+        queryClient.clear();
+        socket.disconnect();
+        toast.success("You have been logged out successfully.");
+        navigate("/sign-in", { replace: true });
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to log out. Please try again.");
+      },
+    });
+  }
 
   const renderNotificationIcon = (type: string) => {
     const iconProps = {
@@ -353,7 +369,7 @@ export const LayoutHeader = () => {
                 <Button
                   variant="ghost"
                   className="w-full justify-start px-4 text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
-                // onClick={logout}
+                  onClick={handleSignOut}
                 >
                   <LogOut className="h-4 w-4 mr-3" />
                   Logout

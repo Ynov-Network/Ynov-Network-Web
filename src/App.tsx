@@ -19,6 +19,7 @@ import AppLayout from "./pages/main/MainLayout";
 import AuthLayout from "./pages/auth/AuthLayout";
 import TwoFactor from "./pages/main/two-factor/TwoFactor";
 import { TotpVerification } from "./pages/main/two-factor/TotpVerification";
+import ProtectedRoute from "./pages/protected-routes/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -36,20 +37,22 @@ const App = () => (
               <Route path="/sign-up" element={<SignUp />} />
             </Route>
 
-            <Route element={<AppLayout />}>
-              {/* Protected routes with layout */}
-              <Route path="/feed" element={<Feed />} />
-              <Route path="/profile/:username?" element={<Profile />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/groups" element={<Groups />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/saved" element={<SavedPosts />} />
-              <Route path="/two-factor">
-                <Route path="enable" element={<TwoFactor />} />
-                <Route path="verify-totp" element={<TotpVerification />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                {/* Protected routes with layout */}
+                <Route path="/feed" element={<Feed />} />
+                <Route path="/profile/:username?" element={<Profile />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/groups" element={<Groups />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/saved" element={<SavedPosts />} />
+                <Route path="/two-factor">
+                  <Route path="enable" element={<TwoFactor />} />
+                  <Route path="verify-totp" element={<TotpVerification />} />
+                </Route>
               </Route>
             </Route>
           </Routes>
