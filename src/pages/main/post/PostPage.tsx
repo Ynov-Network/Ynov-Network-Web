@@ -25,7 +25,7 @@ const PostPage = () => {
 
   return (
     <div className="p-4">
-      <PostCard post={postData.data} />
+      <PostCard post={postData.data._doc} />
     </div>
   );
 };

@@ -119,9 +119,9 @@ const Feed = () => {
         <CreatePost />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="for-you">For You</TabsTrigger>
-            <TabsTrigger value="following">Following</TabsTrigger>
-            <TabsTrigger value="trending">Trending</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" value="for-you">For You</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" value="following">Following</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" value="trending">Trending</TabsTrigger>
           </TabsList>
           <TabsContent value="for-you" className="mt-4">
             {renderFeed(forYouData, fetchNextForYou, hasNextForYou, forYouLoading)}
