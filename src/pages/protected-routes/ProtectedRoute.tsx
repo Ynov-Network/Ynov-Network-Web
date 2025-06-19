@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { authClient } from "@/lib/auth-client" // import the auth client
+import { authClient } from "@/lib/auth-client"
 import SessionVerification from "./session-verification-utils/SessionVerification";
 import type { BetterFetchError } from "better-auth/react";
 
@@ -14,6 +14,8 @@ export type BetterAuthResponse = {
 
 export default function ProtectedRoute() {
   const queryData = authClient.useSession();
+
+  console.log("ProtectedRoute queryData:", queryData);
 
   return (
     <SessionVerification

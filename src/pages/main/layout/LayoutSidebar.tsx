@@ -18,7 +18,6 @@ import {
   Bookmark,
   Users,
   Calendar,
-  Lock
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import LogoHeaderLight from "@/assets/ynov_logo.webp";
@@ -35,7 +34,6 @@ const menuItems = [
   { icon: Bookmark, label: "Saved", path: "/saved" },
   { icon: Users, label: "Groups", path: "/groups" },
   { icon: Calendar, label: "Events", path: "/events" },
-  { icon: Lock, label: "Two Factor", path: "/two-factor/enable" },
 ];
 
 export function LayoutSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

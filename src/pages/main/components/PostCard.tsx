@@ -245,14 +245,18 @@ const PostCard = ({ post }: PostCardProps) => {
         <p className="whitespace-pre-wrap">{post.content}</p>
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-4 items-center">
-            <Button variant="ghost" size="icon" onClick={handleLike}>
-              <Heart className={isLiked ? "text-red-500 fill-current" : ""} />
-            </Button>
-            <span className="text-sm text-muted-foreground">{likeCount}</span>
-            <Button variant="ghost" size="icon" onClick={() => setShowComments(!showComments)}>
-              <MessageCircle />
-            </Button>
-            <span className="text-sm text-muted-foreground">{post.comment_count}</span>
+            <div className="flex items-center">
+              <Button variant="ghost" size="icon" onClick={handleLike}>
+                <Heart className={isLiked ? "text-red-500 fill-current" : ""} />
+              </Button>
+              <span className="text-sm text-muted-foreground">{likeCount}</span>
+            </div>
+            <div className="flex items-center">
+              <Button variant="ghost" size="icon" onClick={() => setShowComments(!showComments)}>
+                <MessageCircle />
+              </Button>
+              <span className="text-sm text-muted-foreground">{post.comment_count}</span>
+            </div>
           </div>
           <Button variant="ghost" size="icon" onClick={handleSave}>
             <Bookmark className={isSaved ? "text-primary fill-current" : ""} />

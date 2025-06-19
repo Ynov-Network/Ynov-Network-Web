@@ -14,9 +14,16 @@ export function useUpdateUserProfile() {
 }
 
 export function useUpdateProfilePicture() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["updateProfilePicture"],
-    mutationFn: (data: usersApi.UpdateProfilePictureRequest) => usersApi.updateProfilePicture(data),
+    mutationFn: (file: File) => {
+      const formData = new FormData();
+      formData.append("image", file);
+      return usersApi.updateProfilePicture(formData)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+    },
   });
 }
 
@@ -24,6 +31,17 @@ export function useUpdatePrivacySettings() {
   return useMutation({
     mutationKey: ["updatePrivacySettings"],
     mutationFn: (data: usersApi.UpdatePrivacySettingsRequest) => usersApi.updatePrivacySettings(data),
+  });
+}
+
+export function useUpdateNotificationSettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateNotificationSettings"],
+    mutationFn: (data: usersApi.UpdateNotificationSettingsRequest) => usersApi.updateNotificationSettings(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+    },
   });
 }
 

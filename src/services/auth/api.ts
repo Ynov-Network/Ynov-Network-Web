@@ -24,6 +24,15 @@ const signIn = async (data: SignInRequest) => {
   return await authClient.post<SignInRequest>("/sign-in", data);
 };
 
+export interface SignInSocialRequest {
+  provider: string;
+  callbackURL: string;
+}
+
+const signInSocial = async (data: SignInSocialRequest) => {
+  return await authClient.post<SignInSocialRequest>("/sign-in/social", data);
+};
+
 const signOut = async () => {
   return await authClient.post("/sign-out");
 };
@@ -31,5 +40,6 @@ const signOut = async () => {
 export {
   signUp,
   signIn,
+  signInSocial,
   signOut
 };

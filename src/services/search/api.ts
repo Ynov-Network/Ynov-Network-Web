@@ -24,4 +24,4 @@ export interface SearchResponse {
 
 export const performSearch = (params: SearchParams) => {
     return searchClient.get<SearchResponse>("/", { params });
-}; 
+};

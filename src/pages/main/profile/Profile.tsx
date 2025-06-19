@@ -1,5 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { useGetMyProfile, useGetUserProfile, useGetLikedPosts } from "@/services/users/queries";
+import { Link, useParams } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useFollowUser, useUnfollowUser } from "@/services/follow/mutation";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useGetPostsByUser } from "@/services/posts/queries";
+import { PostCardSkeleton } from "@/pages/main/components/PostCardSkeleton";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MapPin,
@@ -10,43 +18,41 @@ import {
   Settings,
   Image as ImageIcon
 } from "lucide-react";
-import { Link, useParams } from "react-router";
 import PostCard from "../components/PostCard";
-import { useGetMyProfile, useGetUserProfile } from "@/services/users/queries";
-import { useFollowUser, useUnfollowUser } from "@/services/follow/mutation";
-import { PostCardSkeleton } from "../components/PostCardSkeleton";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useGetPostsByUser } from "@/services/posts/queries";
+import { FollowListDialog } from "./FollowListDialog";
 
 const Profile = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { username } = useParams<{ username: string }>();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("posts");
+  const [followListState, setFollowListState] = useState<{
+    isOpen: boolean;
+    type: 'followers' | 'following';
+  }>({ isOpen: false, type: 'followers' });
 
-  const { data: myProfileData, isLoading: isMyProfileLoading } = useGetMyProfile();
-  const { data: userProfileData, isLoading: isUserProfileLoading } = useGetUserProfile(userId as string, {
-    enabled: !!userId,
-  });
+  const { data: myProfileData } = useGetMyProfile();
+  const { data: userProfileData, isLoading } = useGetUserProfile(username ?? "", { enabled: !!username });
 
-  const myProfile = myProfileData?.data;
-  const userProfile = userId ? userProfileData?.data : myProfile;
-  const isLoading = userId ? isUserProfileLoading : isMyProfileLoading;
+  const user = username ? userProfileData?.data : myProfileData?.data;
+  const isMyProfile = !username || myProfileData?.data?.username === user?.username;
 
-  const { data: postsData, isLoading: arePostsLoading } = useGetPostsByUser(userProfile?._id ?? '', {
-    enabled: !!userProfile?._id,
-  });
-  const userPosts = postsData?.data.posts ?? [];
+  const { data: postsData, isLoading: isLoadingPosts } = useGetPostsByUser(user?._id ?? "", { enabled: !!user?._id && activeTab === 'posts' });
+  const { data: likedPostsData, isLoading: isLoadingLikedPosts } = useGetLikedPosts(user?._id ?? "", { enabled: !!user?._id && activeTab === 'liked' });
 
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
 
+  const handleOpenFollowDialog = (type: 'followers' | 'following') => {
+    setFollowListState({ isOpen: true, type });
+  };
+
   const handleFollowToggle = () => {
-    if (!userProfile) return;
-    const mutation = userProfile.is_following ? unfollowMutation : followMutation;
-    mutation.mutate(userProfile._id, {
+    if (!user) return;
+    const mutation = user.is_following ? unfollowMutation : followMutation;
+    mutation.mutate(user._id, {
       onSuccess: () => {
-        toast.success(userProfile.is_following ? `Unfollowed @${userProfile?.username}` : `Followed @${userProfile?.username}`);
-        queryClient.invalidateQueries({ queryKey: ["user-profile", userId] });
+        toast.success(user.is_following ? `Unfollowed @${user?.username}` : `Followed @${user?.username}`);
+        queryClient.invalidateQueries({ queryKey: ["user-profile", username] });
         queryClient.invalidateQueries({ queryKey: ["user", "me"] });
       },
       onError: (error) => {
@@ -82,12 +88,9 @@ const Profile = () => {
     );
   }
 
-  if (!userProfile) {
+  if (!user) {
     return <div>User not found</div>
   }
-
-  const isOwnProfile = !userId || myProfile?._id === userProfile._id;
-
 
   return (
     <div className="min-h-screen">
@@ -109,23 +112,23 @@ const Profile = () => {
               {/* Avatar and Basic Info */}
               <div className="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-6">
                 <Avatar className="h-32 w-32 border-4 border-card shadow-lg">
-                  <AvatarImage src={userProfile.profile_picture_url} />
+                  <AvatarImage src={user.profile_picture_url} />
                   <AvatarFallback className="bg-gradient-brand text-primary-foreground text-2xl font-bold">
-                    {userProfile.first_name[0]}
+                    {user.first_name[0]}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="md:mt-0">
                   <div className="flex items-center space-x-2">
-                    <h1 className="text-2xl font-bold">{userProfile.first_name} {userProfile.last_name}</h1>
+                    <h1 className="text-2xl font-bold">{user.first_name} {user.last_name}</h1>
                   </div>
-                  <p className="text-muted-foreground">@{userProfile.username}</p>
+                  <p className="text-muted-foreground">@{user.username}</p>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex space-x-3 mt-4 md:mt-0">
-                {isOwnProfile ? (
+                {isMyProfile ? (
                   <Link to="/settings">
                     <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                       <Settings className="h-4 w-4 mr-2" />
@@ -139,12 +142,12 @@ const Profile = () => {
                       Message
                     </Button>
                     <Button
-                      className={`${userProfile.is_following ? 'bg-muted text-muted-foreground hover:bg-accent' : 'bg-gradient-brand hover:opacity-90 text-white'}`}
+                      className={`${user.is_following ? 'bg-muted text-muted-foreground hover:bg-accent' : 'bg-gradient-brand hover:opacity-90 text-white'}`}
                       onClick={handleFollowToggle}
                       disabled={followMutation.isPending || unfollowMutation.isPending}
                     >
                       <UserPlus className="h-4 w-4 mr-2" />
-                      {userProfile.is_following ? 'Following' : 'Follow'}
+                      {user.is_following ? 'Following' : 'Follow'}
                     </Button>
                   </>
                 )}
@@ -156,35 +159,37 @@ const Profile = () => {
 
             {/* Bio and Details */}
             <div className="mt-4 space-y-4">
-              <p className="text-foreground leading-relaxed max-w-2xl">{userProfile.bio}</p>
+              <p className="text-foreground leading-relaxed max-w-2xl">{user.bio}</p>
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{userProfile.city}, {userProfile.country}</span>
-                </div>
+                {(user.city || user.country) &&
+                  <div className="flex items-center space-x-1">
+                    <MapPin className="h-4 w-4" />
+                    <span>{user.city}, {user.country}</span>
+                  </div>
+                }
                 {/* <div className="flex items-center space-x-1">
                   <LinkIcon className="h-4 w-4" />
-                  <a href={userProfile.website} className="text-primary hover:underline">
+                  <a href={user.website} className="text-primary hover:underline">
                     portfolio.student.dev
                   </a>
                 </div> */}
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>Joined {new Date(userProfile.date_joined).toLocaleDateString()}</span>
+                  <span>Joined {new Date(user.date_joined).toLocaleDateString()}</span>
                 </div>
               </div>
 
               {/* Stats */}
               <div className="flex space-x-6 text-sm">
-                <div className="flex space-x-1">
-                  <span className="font-semibold">{userProfile.following_count}</span>
+                <button type="button" className="flex space-x-1 cursor-pointer hover:underline" onClick={() => handleOpenFollowDialog('following')}>
+                  <span className="font-semibold">{user.following_count}</span>
                   <span className="text-muted-foreground">Following</span>
-                </div>
-                <div className="flex space-x-1">
-                  <span className="font-semibold">{userProfile.follower_count}</span>
+                </button>
+                <button type="button" className="flex space-x-1 cursor-pointer hover:underline" onClick={() => handleOpenFollowDialog('followers')}>
+                  <span className="font-semibold">{user.follower_count}</span>
                   <span className="text-muted-foreground">Followers</span>
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -192,7 +197,7 @@ const Profile = () => {
 
         {/* Content Tabs */}
         <div className="border-t border-border">
-          <Tabs defaultValue="posts" className="w-full">
+          <Tabs defaultValue="posts" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="w-full rounded-none border-b border-border bg-transparent h-auto p-0">
               <TabsTrigger
                 value="posts"
@@ -216,10 +221,10 @@ const Profile = () => {
 
             <div>
               <TabsContent value="posts" className="space-y-6 mt-0">
-                {arePostsLoading ? (
+                {isLoadingPosts ? (
                   Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)
-                ) : userPosts.length > 0 ? (
-                  userPosts.map((post) => (
+                ) : postsData?.data?.posts && postsData.data.posts.length > 0 ? (
+                  postsData.data.posts.map((post) => (
                     <PostCard key={post._id} post={post} />
                   ))
                 ) : (
@@ -239,14 +244,28 @@ const Profile = () => {
               </TabsContent>
 
               <TabsContent value="likes" className="mt-0">
-                <div className="text-center py-12 text-muted-foreground">
-                  Liked posts will appear here
-                </div>
+                {isLoadingLikedPosts ? (
+                  Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)
+                ) : likedPostsData?.data && likedPostsData.data.length > 0 ? (
+                  likedPostsData.data.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    This user hasn't liked any posts yet.
+                  </div>
+                )}
               </TabsContent>
             </div>
           </Tabs>
         </div>
       </div>
+      <FollowListDialog
+        type={followListState.type}
+        userId={user._id}
+        isOpen={followListState.isOpen}
+        onOpenChange={(isOpen) => setFollowListState({ ...followListState, isOpen })}
+      />
     </div>
   );
 };

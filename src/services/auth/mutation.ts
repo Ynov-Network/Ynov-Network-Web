@@ -16,6 +16,14 @@ export function useSignIn() {
   });
 }
 
+export function useSignInSocial() {
+  return useMutation({
+    mutationKey: ["sign-in-social"],
+    mutationFn: async (data: authApi.SignInSocialRequest) =>
+      await authApi.signInSocial(data)
+  });
+}
+
 export function useSignOut() {
   return useMutation({
     mutationKey: ["sign-out"],
