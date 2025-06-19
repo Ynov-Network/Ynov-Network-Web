@@ -193,7 +193,7 @@ const PostCard = ({ post }: PostCardProps) => {
       }
     })
   };
-
+  console.log(post)
   return (
     <Card>
       <CardHeader>
