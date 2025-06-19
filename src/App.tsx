@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes, Outlet } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider"
@@ -19,8 +19,19 @@ import AppLayout from "./pages/main/MainLayout";
 import AuthLayout from "./pages/auth/AuthLayout";
 import ProtectedRoute from "./pages/protected-routes/ProtectedRoute";
 import PostPage from "./pages/main/post/PostPage";
+import ContactPage from "./pages/contact";
+import Header from "./pages/auth/layout/header";
+import Footer from "./pages/auth/layout/footer";
 
 const queryClient = new QueryClient();
+
+const PublicLayout = () => (
+  <>
+    <Header />
+    <Outlet />
+    <Footer />
+  </>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -29,7 +40,10 @@ const App = () => (
         <Toaster richColors expand={true} />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
 
             <Route element={<AuthLayout />}>
               <Route path="/sign-in" element={<SignIn />} />

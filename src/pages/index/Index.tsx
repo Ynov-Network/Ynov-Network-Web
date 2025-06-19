@@ -12,8 +12,6 @@ import {
   Quote,
 } from "lucide-react";
 import { Link } from "react-router";
-import LogoHeader from "@/assets/ynov_logo_black.webp";
-import LogoFooter from "@/assets/ynov_logo.webp";
 import { Badge } from "@/components/ui/badge";
 
 const Index = () => {
@@ -91,49 +89,14 @@ const Index = () => {
 
   return (
     <div className="bg-background text-foreground">
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
-        <nav className="px-6 py-4 flex justify-between items-center border-b border-border">
-          <img src={LogoHeader} alt="Ynov Network Logo" className="h-8" />
-          <div className="hidden md:flex items-center space-x-6">
-            <a
-              href="#features"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#community"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Community
-            </a>
-            <a
-              href="#contact"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Contact
-            </a>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link to="/sign-in">
-              <Button
-                variant="ghost"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/sign-up">
-              <Button className="bg-gradient-to-r from-primary to-brand-secondary text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                Get Started
-              </Button>
-            </Link>
-          </div>
-        </nav>
-      </header>
 
       <main>
-        <section className="px-6 py-20 md:py-32 relative overflow-hidden bg-background bg-aurora-soft">
+        {/* Hero Section */}
+        <section className="relative px-6 py-20 bg-gradient-to-br from-blue-50 via-white to-orange-50 overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full opacity-20 animate-float"></div>
+          <div className="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-20 animate-[float_4s_ease-in-out_infinite_reverse]"></div>
+
           <div className="relative z-10">
             <div className="absolute inset-0 z-0 opacity-5 dark:opacity-20">
               <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full filter blur-3xl animate-pulse-glow"></div>
@@ -152,12 +115,11 @@ const Index = () => {
                   <Sparkles className="h-4 w-4 mr-2 text-primary" />
                   Exclusively for Ynov Campus
                 </Badge>
-
-                <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter">
-                  <span className="text-foreground">Your Campus,</span>
+                <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+                  <span className="text-gray-800">Connect & Learn with</span>
                   <br />
-                  <span className="bg-gradient-to-r from-primary to-brand-secondary bg-clip-text text-transparent">
-                    Connected.
+                  <span className="bg-primary bg-clip-text text-transparent">
+                    YNetwork
                   </span>
                 </h1>
 
@@ -171,7 +133,7 @@ const Index = () => {
                   <Link to="/sign-up">
                     <Button
                       size="lg"
-                      className="w-full sm:w-auto bg-gradient-to-r from-primary to-brand-secondary text-white px-8 py-4 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      className="w-full cursor-pointer sm:w-auto bg-gradient-to-r from-primary to-brand-secondary text-white px-8 py-4 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
                       Join for Free
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -181,7 +143,7 @@ const Index = () => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full sm:w-auto px-8 py-4 border-2 border-border text-muted-foreground hover:bg-accent transition-all duration-300"
+                      className="cursor-pointer w-full sm:w-auto px-8 py-4 border-2 border-border text-muted-foreground hover:bg-accent transition-all duration-300"
                     >
                       <Play className="mr-2 h-5 w-5" />
                       See How It Works
@@ -286,6 +248,7 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Features Section */}
         <section id="features" className="px-6 py-20 relative overflow-hidden bg-muted/30 bg-aurora-soft">
           <div className="relative z-10">
             <div className="max-w-7xl mx-auto">
@@ -302,7 +265,7 @@ const Index = () => {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {features.map((feature, index) => (
                   <div
-                    key={index}
+                    key={feature.title}
                     className="group bg-card border border-border rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-fade-in-up"
                     style={{ animationDelay: `${0.3 + index * 0.1}s` }}
                   >
@@ -324,6 +287,7 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Community Section */}
         <section id="community" className="px-6 py-20 relative overflow-hidden bg-background bg-aurora-soft">
           <div className="relative z-10">
             <div className="max-w-5xl mx-auto text-center">
@@ -337,7 +301,7 @@ const Index = () => {
               <div className="mt-12 grid md:grid-cols-3 gap-8">
                 {testimonials.map((testimonial, index) => (
                   <div
-                    key={index}
+                    key={testimonial.name}
                     className="bg-card border border-border rounded-xl p-6 text-left flex flex-col animate-fade-in-up"
                     style={{ animationDelay: `${0.3 + index * 0.1}s` }}
                   >
@@ -367,6 +331,7 @@ const Index = () => {
           </div>
         </section>
 
+        {/* CTA Section */}
         <section className="px-6 py-20 text-center bg-gradient-to-r from-primary to-brand-secondary">
           <div className="animate-fade-in">
             <h2 className="text-4xl font-bold mb-6 text-white">
@@ -379,7 +344,7 @@ const Index = () => {
               <Button
                 size="lg"
                 variant="secondary"
-                className="bg-white text-primary hover:bg-white/90 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="bg-white cursor-pointer text-primary hover:bg-white/90 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
                 Sign Up for Free
               </Button>
@@ -387,59 +352,6 @@ const Index = () => {
           </div>
         </section>
       </main>
-
-      <footer className="px-6 py-12 bg-gray-900 text-gray-300">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-4 gap-8">
-          <div>
-            <img src={LogoFooter} alt="Ynov Network Logo" className="h-8 mb-4" />
-            <p className="text-gray-400 text-sm">
-              The exclusive social network for students of Ynov Campus.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4 text-white">Platform</h3>
-            <div className="space-y-2 text-sm text-gray-400">
-              <a href="#features" className="block hover:text-primary">
-                Features
-              </a>
-              <a href="#community" className="block hover:text-primary">
-                Community
-              </a>
-              <a href="#contact" className="block hover:text-primary">
-                Contact
-              </a>
-            </div>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4 text-white">Community</h3>
-            <div className="space-y-2 text-sm text-gray-400">
-              <a href="#" className="block hover:text-primary">
-                Guidelines
-              </a>
-              <a href="#" className="block hover:text-primary">
-                Leaderboards
-              </a>
-              <a href="#" className="block hover:text-primary">
-                Events
-              </a>
-            </div>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4 text-white">Legal</h3>
-            <div className="space-y-2 text-sm text-gray-400">
-              <a href="#" className="block hover:text-primary">
-                Privacy Policy
-              </a>
-              <a href="#" className="block hover:text-primary">
-                Terms of Service
-              </a>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} Ynov Network. All Rights Reserved.
-        </div>
-      </footer>
     </div>
   );
 };
