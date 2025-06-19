@@ -23,6 +23,7 @@ import { socket } from "@/lib/socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { CreateConversationDialog } from "./CreateConversationDialog";
 import { formatRelativeTime } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const Chat = () => {
   const [message, setMessage] = useState("");
@@ -295,7 +296,7 @@ const Chat = () => {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-auto p-6 space-y-4">
+              <ScrollArea className="h-[500px] p-6 space-y-4">
                 {areMessagesLoading ? (
                   <div className="space-y-4">
                     <Skeleton className="h-16 w-3/4" />
@@ -322,7 +323,7 @@ const Chat = () => {
                   ))
                 )}
                 <div ref={messagesEndRef} />
-              </div>
+              </ScrollArea>
 
               {/* Message Input */}
               <div className="bg-background border-t border-border p-4">

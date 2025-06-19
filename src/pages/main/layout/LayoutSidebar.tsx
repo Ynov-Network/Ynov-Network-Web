@@ -29,8 +29,8 @@ import { cn } from "@/lib/utils";
 const menuItems = [
   { icon: Home, label: "Home", path: "/feed" },
   { icon: Search, label: "Explore", path: "/explore" },
-  { icon: Bell, label: "Notifications", path: "/notifications", badge: 3 },
-  { icon: MessageCircle, label: "Messages", path: "/chat", badge: 2 },
+  { icon: Bell, label: "Notifications", path: "/notifications" },
+  { icon: MessageCircle, label: "Messages", path: "/chat" },
   { icon: Bookmark, label: "Saved", path: "/saved" },
   { icon: Users, label: "Groups", path: "/groups" },
   { icon: Calendar, label: "Events", path: "/events" },
@@ -73,11 +73,6 @@ export function LayoutSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
                           <item.icon className="size-5" />
                           <span className={cn(!open && "hidden")}>{item.label}</span>
                         </div>
-                        {(item.badge && open) && (
-                          <span className="bg-destructive text-white font-semibold text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {item.badge}
-                          </span>
-                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

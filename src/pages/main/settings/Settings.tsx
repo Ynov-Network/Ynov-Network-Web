@@ -229,30 +229,14 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto py-12 px-6">
-        <header className="bg-background border-b border-border px-6 py-4">
+      <div className="mx-auto py-6 px-6">
+        <header className="bg-background border-b border-border p-6">
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <p className="text-muted-foreground">Manage your account settings and preferences</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-          <div className="md:col-span-1">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={user?.profile_picture_url} />
-                    <AvatarFallback>{user?.first_name?.[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h2 className="text-lg font-semibold">{user?.first_name} {user?.last_name}</h2>
-                    <p className="text-muted-foreground">@{user?.username}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="md:col-span-2">
+        <div>
+          <div>
             <Tabs defaultValue="profile" className="w-full">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="profile">Profile</TabsTrigger>

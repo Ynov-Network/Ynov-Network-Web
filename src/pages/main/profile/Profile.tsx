@@ -137,10 +137,12 @@ const Profile = () => {
                   </Link>
                 ) : (
                   <>
+                  <Link to={"/chat"}>
                     <Button variant="outline">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Message
                     </Button>
+                  </Link>
                     <Button
                       className={`${user.is_following ? 'bg-muted text-muted-foreground hover:bg-accent' : 'bg-gradient-brand hover:opacity-90 text-white'}`}
                       onClick={handleFollowToggle}
