@@ -43,11 +43,11 @@ const App = () => (
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/contact" element={<ContactPage />} />
-            </Route>
 
-            <Route element={<AuthLayout />}>
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/sign-up" element={<SignUp />} />
+              <Route element={<AuthLayout />}>
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
+              </Route>
             </Route>
 
             <Route element={<ProtectedRoute />}>
