@@ -14,6 +14,7 @@ import { Link } from "react-router";
 const Feed = () => {
   const [activeTab, setActiveTab] = useState("for-you");
 
+
   const {
     data: forYouData,
     isLoading: forYouLoading,
@@ -97,14 +98,13 @@ const Feed = () => {
               <Link to={`/profile/${user.username}`} className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={user.profile_picture_url} />
-                  <AvatarFallback>{user.first_name[0]}</AvatarFallback>
+                  <AvatarFallback>{user.username[0]}</AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-semibold text-sm">{user.first_name} {user.last_name}</p>
                   <p className="text-xs text-muted-foreground">@{user.username}</p>
                 </div>
               </Link>
-              <Button size="sm">Follow</Button>
             </div>
           ))}
         </div>
